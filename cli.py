@@ -1,3 +1,5 @@
+import db
+
 def clear():
     print("\033[2J\033[H", end="")
 
@@ -25,3 +27,4 @@ def p(prompt="", options=[]):
         except:
             log = "\nYou should enter a number from the below list"
 
+log = ""
