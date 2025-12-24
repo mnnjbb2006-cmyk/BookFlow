@@ -36,8 +36,8 @@ def p(prompt="", options=[]):
 
 def Admin(username):
     global log
-    try:
-        while(True):
+    while(True):
+        try:
             choice = p(f"Welcome {username} (Admin)", ["List Users", "Add User", "Remove User", "Disable/Enable user", "Logout"])
             if choice == 5:
                 return
@@ -49,13 +49,17 @@ def Admin(username):
                 u = users.adduser(r("Username: "), r("Password: "), r("Full name: "), l[choice - 1])
                 log = f"\nSuccessfully created user {u}"
             elif choice == 3:
-                pass
+                u = r("Username: ")
+                if u == username:
+                    raise ValueError("You can not delete yourself")
+                users.deluser(u)
+                log = f"\nSuccessfully {u} was deleted"
             elif choice == 4:
                 pass
-    except SystemExit:
-        raise
-    except Exception as e:
-        log = f"\nError: {e}"
+        except SystemExit:
+            raise
+        except Exception as e:
+            log = f"\nError: {e}"
 
 def Librarian(username):
     exit()
@@ -73,7 +77,7 @@ while(True):
         if  x['password'] == password:
             eval(x['role'] + """(x["name"])""")
         else:
-            ValueError("This user does not exist")
+            raise ValueError("This user does not exist")
     except SystemExit:
         raise
     except Exception as e:
