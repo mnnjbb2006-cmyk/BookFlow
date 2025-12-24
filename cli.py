@@ -83,13 +83,14 @@ def Admin(name, username):
                     users.enable(u)
                     log = f"\nSuccessfully enabled {u}"
             elif choice == 5:
-                log = table(books.findbooks(r("Title: "), r("Author: "), r("Category: "), r("Min total count: "), r("Min available count: "), r("Max total count: "), r("Max available count: ")),
+                log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Authore (leave emtpy to not consider): "), r("Categorye (leave emtpy to not consider): "), r("Min total counte (leave emtpy to not consider): "), r("Min available counte (leave emtpy to not consider): "), r("Max total counte (leave emtpy to not consider): "), r("Max available counte (leave emtpy to not consider): ")),
                 ["_id", "Title", "Author", "Total count", "Available count"])
             elif choice == 6:
                 log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "), r("Available count: "))} books to library"
             elif choice == 7:
-                pass
-            elif choice == 7:
+                books.delbook(r("_id: "))
+                log = f"\nSuccessfully the books were deleted"
+            elif choice == 8:
                 pass
         except SystemExit:
             raise

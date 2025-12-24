@@ -1,6 +1,7 @@
 from db import books
 from db import ConnectionFailure
 from db import e
+from bson import ObjectId
 
 max_book = len(books.find({}).to_list())
 
@@ -13,8 +14,15 @@ def i(x):
     except:
         raise ValueError("Total count and available count should be non-negative integer")
 
+def o(x):
+    try:
+        return ObjectId(x)
+    except:
+        raise ValueError("_id is invalid")
+
 def addbook(title, author, category, total_count, available_count):
     #relation of total and available should be checked
+    global max_book
     try:
         ltitle = title.lower()
         total_count = i(total_count)
@@ -46,5 +54,14 @@ def findbooks(title, author, category, min_total, min_available, max_total, max_
         min_available = i(min_available)
         #return books.find({"ltitle":{"$regex":title, "$options":"i"}, "author":{"$regex":author, "$options":"i"}}).to_list()
         return books.find({"ltitle":{"$regex":title, "$options":"i"}, "author":{"$regex":author, "$options":"i"}, "category":{"$regex":category, "$options":"i"}, "total count":{"$lte":max_total, "$gte":min_total}, "available count":{"$lte":max_available, "$gte":min_available}}).to_list()
+    except ConnectionFailure:
+        e()
+
+def delbook(_id):
+    try:
+        _id = o(_id)
+        x = books.delete_one({"_id":_id}).deleted_count
+        if x == 0:
+            raise ValueError("This book does not exist")
     except ConnectionFailure:
         e()
