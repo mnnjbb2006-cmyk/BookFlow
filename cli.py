@@ -15,6 +15,7 @@ def p(prompt="", options=[]):
     while(True):
         clear()
         print("\n" + prompt + log)
+        log = ""
         x = 1
         for option in options:
             print(f"{x})", option)
@@ -24,7 +25,7 @@ def p(prompt="", options=[]):
             choice = int(r("> "))
             if choice < 0 or choice > x:
                 raise
-            if x == 0:
+            if choice == 0:
                 exit()
             return choice
         except SystemExit:
@@ -33,3 +34,6 @@ def p(prompt="", options=[]):
             log = "\nYou should enter a number from the below list"
 
 log = ""
+while(True):
+    choice = p("Library Manager:", ['Login'])
+    print(choice)
