@@ -20,8 +20,8 @@ def p(prompt="", options=[]):
         x = 1
         for option in options:
             print(f"{x})", option)
-            print("0) Exit")
             x += 1
+        print("0) Exit")
         try:
             choice = int(r("> "))
             if choice < 0 or choice > x:
@@ -35,7 +35,16 @@ def p(prompt="", options=[]):
             log = "\nYou should enter a number from the below list"
 
 def admin(username):
-    exit()
+    global log
+    try:
+        while(True):
+            choice = p(f"Welcome {username} (Admin)", ["List Users", "Add User", "Remove User", "Disable/Enable user", "Logout"])
+            if choice == 5:
+                return
+    except SystemExit:
+        raise
+    except Exception as e:
+        log = f"\nError: {e}"
 
 def librarian(username):
     exit()
@@ -51,7 +60,7 @@ while(True):
         password = r("Password: ")
         x = users.getuser(username)
         if  x['password'] == password:
-            eval(x['role'] + f"({username})")
+            eval(x['role'] + """(x["name"])""")
         else:
             ValueError("This user does not exist")
     except SystemExit:
