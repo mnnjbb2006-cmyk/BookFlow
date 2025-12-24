@@ -4,9 +4,15 @@ from db import e
 
 #are CRU funcion returning something?
 
+def getusers():
+    try:
+        return users.find({}, {"_id":0}).to_list()
+    except ConnectionFailure:
+        e() 
+
 def getuser(username):
     try:
-        x = users.find_one({"username":username}, {"_id":0})
+        x = users.find_one({"username":username})
         if x == None:
             raise ValueError("This user does not exist")
         return x

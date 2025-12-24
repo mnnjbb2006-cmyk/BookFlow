@@ -4,6 +4,21 @@ from Collections import users
 def clear():
     print("\033[2J\033[H", end="")
 
+def table(rows, col):
+    s = ""
+    if not rows:
+        print("No data.")
+        return s
+    columns = list(map(str.lower, col))
+    widths = {c: max(len(c), max(len(str(r.get(c, ""))) for r in rows)) for c in columns}
+    header = " | ".join(c.ljust(widths[c.lower()]) for c in col)
+    sep = "-+-".join("-" * widths[c] for c in columns)
+    s = header + '\n'
+    s += sep + '\n'
+    for r in rows:
+        s += (" | ".join(str(r.get(c, "")).ljust(widths[c]) for c in columns)) + '\n'
+    return '\n' + s
+
 def r(prompt):
     x = input(prompt).strip()
     for c in x:
@@ -42,7 +57,7 @@ def Admin(name, username):
             if choice == 5:
                 return
             elif choice == 1:
-                pass
+                log = table(users.getusers(), ["Username", "Name", "Role", "Status"])
             elif choice == 2:
                 l = ["Admin", "Librarian", "User"]
                 choice = p("Select role:", l)
