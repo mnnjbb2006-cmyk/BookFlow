@@ -1,4 +1,5 @@
 import db
+from Colloctions import users
 
 def clear():
     print("\033[2J\033[H", end="")
@@ -36,4 +37,3 @@ def p(prompt="", options=[]):
 log = ""
 while(True):
     choice = p("Library Manager:", ['Login'])
-    print(choice)
