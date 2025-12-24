@@ -1,5 +1,5 @@
 import db
-from Colloctions import users
+from Collections import users
 
 def clear():
     print("\033[2J\033[H", end="")
@@ -33,6 +33,15 @@ def p(prompt="", options=[]):
             raise
         except:
             log = "\nYou should enter a number from the below list"
+
+def admin(username):
+    exit()
+
+def librarian(username):
+    exit()
+
+def user(username):
+    exit()
 
 log = ""
 while(True):
