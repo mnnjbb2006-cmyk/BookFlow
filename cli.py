@@ -18,12 +18,17 @@ def p(prompt="", options=[]):
         x = 1
         for option in options:
             print(f"{x})", option)
+            print("0) Exit")
             x += 1
         try:
             choice = int(r("> "))
             if choice < 0 or choice > x:
                 raise
+            if x == 0:
+                exit()
             return choice
+        except SystemExit:
+            raise
         except:
             log = "\nYou should enter a number from the below list"
 
