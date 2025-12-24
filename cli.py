@@ -1,4 +1,5 @@
 import db
+from Collections import books
 from Collections import users
 
 def clear():
@@ -53,8 +54,8 @@ def Admin(name, username):
     global log
     while(True):
         try:
-            choice = p(f"Welcome {name} (Admin)", ["List Users", "Add User", "Remove User", "Disable/Enable user", "Logout"])
-            if choice == 5:
+            choice = p(f"Welcome {name} (Admin)", ["List Users", "Add User", "Remove User", "Disable/Enable user", "Find books", "Add books", "Edit books", "Request", "Logout"])
+            if choice == 9:
                 return
             elif choice == 1:
                 log = table(users.getusers(), ["Username", "Name", "Role", "Status"])
@@ -81,6 +82,14 @@ def Admin(name, username):
                     u = r("Username: ")
                     users.enable(u)
                     log = f"\nSuccessfully enabled {u}"
+            elif choice == 5:
+                pass
+            elif choice == 6:
+                log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "), r("Available count: "))} books to library"
+            elif choice == 7:
+                pass
+            elif choice == 7:
+                pass
         except SystemExit:
             raise
         except Exception as e:
