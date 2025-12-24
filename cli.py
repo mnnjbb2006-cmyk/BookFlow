@@ -34,17 +34,17 @@ def p(prompt="", options=[]):
         except:
             log = "\nYou should enter a number from the below list"
 
-def Admin(username):
+def Admin(name, username):
     global log
     while(True):
         try:
-            choice = p(f"Welcome {username} (Admin)", ["List Users", "Add User", "Remove User", "Disable/Enable user", "Logout"])
+            choice = p(f"Welcome {name} (Admin)", ["List Users", "Add User", "Remove User", "Disable/Enable user", "Logout"])
             if choice == 5:
                 return
             elif choice == 1:
                 pass
             elif choice == 2:
-                l = ["Admin", "Libririan", "User"]
+                l = ["Admin", "Librarian", "User"]
                 choice = p("Select role:", l)
                 u = users.adduser(r("Username: "), r("Password: "), r("Full name: "), l[choice - 1])
                 log = f"\nSuccessfully created user {u}"
@@ -55,16 +55,26 @@ def Admin(username):
                 users.deluser(u)
                 log = f"\nSuccessfully {u} was deleted"
             elif choice == 4:
-                pass
+                choice = p("", ["Enable", "Disable"])
+                if choice == 2:
+                    u = r("Username: ")
+                    if u == username:
+                        raise ValueError("You can not disable yourself")
+                    users.disable(u)
+                    log = f"\nSuccessfully disabled {u}"
+                else:
+                    u = r("Username: ")
+                    users.enable(u)
+                    log = f"\nSuccessfully enabled {u}"
         except SystemExit:
             raise
         except Exception as e:
             log = f"\nError: {e}"
 
-def Librarian(username):
+def Librarian(name, username):
     exit()
 
-def User(username):
+def User(name, username):
     exit()
 
 log = ""
@@ -74,8 +84,10 @@ while(True):
         username = r("Username: ")
         password = r("Password: ")
         x = users.getuser(username)
-        if  x['password'] == password:
-            eval(x['role'] + """(x["name"])""")
+        if  x["password"] == password:
+            if x["status"] == "disabled":
+                raise Exception("This user is disabled")
+            eval(x['role'] + """(x["name"], username)""")
         else:
             raise ValueError("This user does not exist")
     except SystemExit:
