@@ -45,4 +45,16 @@ def user(username):
 
 log = ""
 while(True):
-    choice = p("Library Manager:", ['Login'])
+    p("Library Manager:", ['Login'])
+    try:
+        username = r("Username: ")
+        password = r("Password: ")
+        x = users.getuser(username)
+        if  x['password'] == password:
+            eval(x['role'] + f"({username})")
+        else:
+            ValueError("This user does not exist")
+    except SystemExit:
+        raise
+    except Exception as e:
+        log = f"\nError: {e}"

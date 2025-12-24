@@ -2,11 +2,11 @@ from db import users
 from db import ConnectionFailure
 from db import e
 
-def getpass(username):
+def getuser(username):
     try:
         x = users.find_one({"username":username})
         if x == None:
-            return None
-        return x["password"]
+            raise ValueError("This user does not exist")
+        return x
     except ConnectionFailure:
         e() 
