@@ -83,7 +83,8 @@ def Admin(name, username):
                     users.enable(u)
                     log = f"\nSuccessfully enabled {u}"
             elif choice == 5:
-                pass
+                log = table(books.findbooks(r("Title: "), r("Author: "), r("Category: "), r("Min total count: "), r("Min available count: "), r("Max total count: "), r("Max available count: ")),
+                ["_id", "Title", "Author", "Total count", "Available count"])
             elif choice == 6:
                 log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "), r("Available count: "))} books to library"
             elif choice == 7:
