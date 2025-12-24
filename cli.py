@@ -34,22 +34,33 @@ def p(prompt="", options=[]):
         except:
             log = "\nYou should enter a number from the below list"
 
-def admin(username):
+def Admin(username):
     global log
     try:
         while(True):
             choice = p(f"Welcome {username} (Admin)", ["List Users", "Add User", "Remove User", "Disable/Enable user", "Logout"])
             if choice == 5:
                 return
+            elif choice == 1:
+                pass
+            elif choice == 2:
+                l = ["Admin", "Libririan", "User"]
+                choice = p("Select role:", l)
+                u = users.adduser(r("Username: "), r("Password: "), r("Full name: "), l[choice - 1])
+                log = f"\nSuccessfully created user {u}"
+            elif choice == 3:
+                pass
+            elif choice == 4:
+                pass
     except SystemExit:
         raise
     except Exception as e:
         log = f"\nError: {e}"
 
-def librarian(username):
+def Librarian(username):
     exit()
 
-def user(username):
+def User(username):
     exit()
 
 log = ""

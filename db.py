@@ -24,4 +24,4 @@ requests.create_index("username")
 loans.create_index("ltitle")
 
 if users.find_one({}) == None:
-    users.insert_one({"username":"admin", "password":"admin", "name":"admin", "role":"admin", "status":"enabled"})
+    users.insert_one({"username":"admin", "password":"admin", "name":"admin", "role":"Admin", "status":"enabled"})
