@@ -89,7 +89,7 @@ def editbook(_id, title, author, category, total_count, available_count):
             available_count = x["available count"]
         available_count = i(available_count)
         ltitle = title.lower()
-        x = books.find_one({"ltitle":ltitle, "author":{"$regex":author, "$options":"i"}})
+        x = books.find_one({"ltitle":ltitle, "author":{"$regex":author + "$", "$options":"i"}})
         if x != None and x['_id'] != _id:
             raise ValueError("There exist another book with same title and author")
         x = books.update_one({"_id":_id}, {"$set":{"ltitle":ltitle, "title":title, "author":author, "category":category, "total count":total_count, "available count":available_count}}).modified_count
