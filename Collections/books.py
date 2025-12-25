@@ -41,9 +41,15 @@ def addbook(title, author, category, total_count, available_count):
     except ConnectionFailure:
         e()
 
-def findbooks(title, author, category, min_total, min_available, max_total, max_available):
+def findbooks(title="", author="", category="", min_total="", min_available="", max_total="", max_available="", _id=""):
     global max_book
     try:
+        if _id != "":
+            _id = o(_id) 
+            x = books.find_one({"_id":_id})
+            if x == None:
+                raise ValueError("This book does not exist")
+            return x
         ltitle = title.lower()
         if max_total == "":
             max_total = max_book

@@ -1,4 +1,5 @@
 import db
+from services import requests
 from Collections import books
 from Collections import users
 
@@ -54,7 +55,7 @@ def Admin(name, username):
     global log
     while(True):
         try:
-            choice = p(f"Welcome {name} (Admin)", ["List Users", "Add User", "Remove User", "Disable/Enable user", "Find books", "Add books", "Edit books", "Request", "Logout"])
+            choice = p(f"Welcome {name} (Admin)", ["List Users", "Add User", "Remove User", "Disable/Enable user", "Find books", "Add books", "Edit books", "Requests", "Logout"])
             if choice == 9:
                 return
             elif choice == 1:
@@ -107,7 +108,7 @@ def Librarian(name, username):
     global log
     while(True):
         try:
-            choice = p(f"Welcome {name} (Librarian)", ["Find books", "Add books", "Edit books", "Request", "Logout"])
+            choice = p(f"Welcome {name} (Librarian)", ["Find books", "Add books", "Edit books", "Requests", "Logout"])
             if choice == 5:
                 return
             elif choice == 1:
@@ -132,7 +133,35 @@ def Librarian(name, username):
             log = f"\nError: {e}"
 
 def User(name, username):
-    exit()
+    global log
+    while(True):
+        try:
+            choice = p(f"Welcome {name} (User)", ["Find books", "My loans", "Requests", "Logout"])
+            if choice == 4:
+                return
+            elif choice == 1:
+                log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Authore (leave emtpy to not consider): "), r("Categorye (leave emtpy to not consider): "), r("Min total counte (leave emtpy to not consider): "), r("Min available counte (leave emtpy to not consider): "), r("Max total counte (leave emtpy to not consider): "), r("Max available counte (leave emtpy to not consider): ")),
+                ["_id", "Title", "Author", "Total count", "Available count"])
+            elif choice == 2:
+                pass
+            elif choice == 3:
+                #should check my loans
+                choice = p("", ["My requests", "Request loan", "Request renew", "Request return"])
+                if choice == 1:
+                    l = [(x | books.findbooks(_id=x['book id'])) for x in requests.myrequests(username)]
+                    log = table(l, ["Title", "Author", "Type", "Status", "Request date", "Duration"])
+                elif choice == 2:
+                    _id = r("_id of book: ")
+                    x = books.findbooks(_id=_id)
+                    if x == None:
+                        raise ValueError("The _id is invalid")
+                    if x['available count'] == 0:
+                        raise ValueError("The book is currently unavailable")
+                    requests.requestloan(username, _id, r("Duration: "))
+        except SystemExit:
+            raise
+        except Exception as e:
+            log = f"\nError: {e}"
 
 log = ""
 while(True):

@@ -1,2 +1,5 @@
 BookFlowVenv
 test
+__pycache__
+Collections/__pycache__
+services/__pycache__
