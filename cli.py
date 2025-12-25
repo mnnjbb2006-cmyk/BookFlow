@@ -104,7 +104,32 @@ def Admin(name, username):
             log = f"\nError: {e}"
 
 def Librarian(name, username):
-    exit()
+    global log
+    while(True):
+        try:
+            choice = p(f"Welcome {name} (Librarian)", ["Find books", "Add books", "Edit books", "Request", "Logout"])
+            if choice == 5:
+                return
+            elif choice == 1:
+                log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Authore (leave emtpy to not consider): "), r("Categorye (leave emtpy to not consider): "), r("Min total counte (leave emtpy to not consider): "), r("Min available counte (leave emtpy to not consider): "), r("Max total counte (leave emtpy to not consider): "), r("Max available counte (leave emtpy to not consider): ")),
+                ["_id", "Title", "Author", "Total count", "Available count"])
+            elif choice == 2:
+                log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "), r("Available count: "))} books to library"
+            elif choice == 3:
+                _id = r("_id: ")
+                x = books.i(r("New total count (enter 0 to delete): "))
+                if x == 0:
+                    books.delbook(_id)
+                    log = f"\nSuccessfully the books were deleted"
+                else:
+                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x, r("New available value: (leave empty to not change)"))
+                    log = f"\nData edited successfully"
+            elif choice == 4:
+                pass
+        except SystemExit:
+            raise
+        except Exception as e:
+            log = f"\nError: {e}"
 
 def User(name, username):
     exit()

@@ -25,7 +25,7 @@ def adduser(username, password, name, role):
             raise ValueError("Username or password or name can not be empty")
         if users.find_one({"username":username}) != None:
             raise ValueError("Username alredy taken")
-        users.insert_one({"username":username, "password":password, "name":name, "role":role})
+        users.insert_one({"username":username, "password":password, "name":name, "role":role, "status":"enabled"})
         return username
     except ConnectionFailure:
         e() 
