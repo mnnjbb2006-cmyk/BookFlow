@@ -88,8 +88,14 @@ def Admin(name, username):
             elif choice == 6:
                 log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "), r("Available count: "))} books to library"
             elif choice == 7:
-                books.delbook(r("_id: "))
-                log = f"\nSuccessfully the books were deleted"
+                _id = r("_id: ")
+                x = books.i(r("New total count (enter 0 to delete): "))
+                if x == 0:
+                    books.delbook(_id)
+                    log = f"\nSuccessfully the books were deleted"
+                else:
+                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x, r("New available value: (leave empty to not change)"))
+                    log = f"\nData edited successfully"
             elif choice == 8:
                 pass
         except SystemExit:

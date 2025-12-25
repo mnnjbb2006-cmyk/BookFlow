@@ -3,7 +3,9 @@ from db import ConnectionFailure
 from db import e
 from bson import ObjectId
 
-max_book = len(books.find({}).to_list())
+max_book = 0
+for x in books.find({}).to_list():
+    max_book = max(max_book, x["total count"], x["available count"])
 
 def i(x):
     try:
@@ -23,6 +25,8 @@ def o(x):
 def addbook(title, author, category, total_count, available_count):
     #relation of total and available should be checked
     global max_book
+    if title == "" or author == "" or total_count == "" or available_count == "":
+        raise ValueError("Inputs can not be empty")
     try:
         ltitle = title.lower()
         total_count = i(total_count)
@@ -38,6 +42,7 @@ def addbook(title, author, category, total_count, available_count):
         e()
 
 def findbooks(title, author, category, min_total, min_available, max_total, max_available):
+    global max_book
     try:
         ltitle = title.lower()
         if max_total == "":
@@ -63,5 +68,32 @@ def delbook(_id):
         x = books.delete_one({"_id":_id}).deleted_count
         if x == 0:
             raise ValueError("This book does not exist")
+    except ConnectionFailure:
+        e()
+
+def editbook(_id, title, author, category, total_count, available_count):
+    try:
+        _id = o(_id)
+        x = books.find_one({"_id":_id})
+        if x == None:
+            raise ValueError("This book does not exist")
+        if title == "":
+            title = x["title"]
+        if author == "":
+            author = x["author"]
+        if category == "":
+            category = x["category"]
+        if total_count == "":
+            total_count = x["total count"]
+        if available_count == "":
+            available_count = x["available count"]
+        available_count = i(available_count)
+        ltitle = title.lower()
+        x = books.find_one({"ltitle":ltitle, "author":{"$regex":author, "$options":"i"}})
+        if x != None and x['_id'] != _id:
+            raise ValueError("There exist another book with same title and author")
+        x = books.update_one({"_id":_id}, {"$set":{"ltitle":ltitle, "title":title, "author":author, "category":category, "total count":total_count, "available count":available_count}}).modified_count
+        if x == 0:
+            raise Exception("Nothing has been changed")
     except ConnectionFailure:
         e()
