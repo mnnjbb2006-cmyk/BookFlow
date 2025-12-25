@@ -77,7 +77,7 @@ def delbook(_id):
     except ConnectionFailure:
         e()
 
-def editbook(_id, title, author, category, total_count, available_count):
+def editbook(_id, title="", author="", category="", total_count="", available_count=""):
     try:
         _id = o(_id)
         x = books.find_one({"_id":_id})

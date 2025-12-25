@@ -1,3 +1,4 @@
+#should import all to all and fix all function in here and in cli
 from db import requests
 from db import e
 from db import ConnectionFailure
@@ -34,7 +35,7 @@ def myrequests(username):
     except ConnectionFailure:
         e()
 
-def requestrenew(username, _id, duration):
+def request_renew(username, _id, duration):
     try:
         duration = i(duration)
         if requests.find_one({"username":username, "book id": _id, "status":"pending", "type":"renew"}) != None:
@@ -43,9 +44,8 @@ def requestrenew(username, _id, duration):
     except ConnectionFailure:
         e()
 
-def requestreturn(username, _id):
+def request_return(username, _id):
     try:
-        duration = i(duration)
         if requests.find_one({"username":username, "book id": _id, "status":"pending", "type":"return"}) != None:
             raise Exception("You have alredy requeted this")
         requests.insert_one({"username":username, "book id":_id, "request date":datetime.now().replace(microsecond=0), "status":"pending", "type":"return"})
@@ -53,7 +53,37 @@ def requestreturn(username, _id):
         e()
 
 def myrequests(username):
+    #search option
     try:
         return requests.find({"username":username}, {"_id":0, "username":0}).to_list()
+    except ConnectionFailure:
+        e()
+
+def all_requests(username, status):
+    try:
+        status = status.lower()
+        if status != "all":
+            return requests.find({"username":{"$regex":username}, "status":status})
+        return requests.find({"username":{"$regex":username}})
+    except ConnectionFailure:
+        e()
+    
+def get_request(_id):
+    try:
+        _id = o(_id)
+        x = requests.find_one({"_id":_id})
+        if x == None:
+            raise ValueError("_id is not valid")
+        return x
+    except ConnectionFailure:
+        e()
+
+def change_status(_id, status):
+    try:
+        _id = o(_id)
+        #x = requests.find_one({"_id":_id})
+        #if x == None:
+            #raise ValueError("_id is not valid")
+        requests.update_one({"_id":_id}, {"$set":{"status":status}})
     except ConnectionFailure:
         e()
