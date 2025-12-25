@@ -158,6 +158,19 @@ def User(name, username):
                     if x['available count'] == 0:
                         raise ValueError("The book is currently unavailable")
                     requests.requestloan(username, _id, r("Duration: "))
+                    log = "\nRequest sent successfully"
+                elif choice == 3:
+                    _id = r("_id of book: ")
+                    if books.findbooks(_id=_id) == None:
+                        raise ValueError("The _id is invalid")
+                    requests.requestrenew(username, _id, r("Duration: "))
+                    log = "\nRequest sent successfully"
+                elif choice == 4:
+                    _id = r("_id of book: ")
+                    if books.findbooks(_id=_id) == None:
+                        raise ValueError("The _id is invalid")
+                    requests.requestreturn(username, _id)
+                    log = "\nRequest sent successfully"
         except SystemExit:
             raise
         except Exception as e:
