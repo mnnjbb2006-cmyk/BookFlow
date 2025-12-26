@@ -35,6 +35,12 @@ def myrequests(username):
     except ConnectionFailure:
         e()
 
+def exist(username, _id):
+    try:
+        if requests.find_one({"username":username, "book id":_id, "status":"pending"}, {"_id":0, "username":0}) != None:
+            raise Exception("You alredy have a pending request on this book")
+    except ConnectionFailure:
+        e()
 def request_renew(username, _id, duration):
     try:
         duration = i(duration)

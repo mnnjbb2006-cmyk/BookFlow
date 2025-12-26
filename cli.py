@@ -85,8 +85,8 @@ def Admin(name, username):
                     users.enable(u)
                     log = f"\nSuccessfully enabled {u}"
             elif choice == 5:
-                log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Authore (leave emtpy to not consider): "), r("Categorye (leave emtpy to not consider): "), r("Min total counte (leave emtpy to not consider): "), r("Min available counte (leave emtpy to not consider): "), r("Max total counte (leave emtpy to not consider): "), r("Max available counte (leave emtpy to not consider): ")),
-                ["_id", "Title", "Author", "Total count", "Available count"])
+                log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Author (leave empty to not consider): "), r("Category (leave empty to not consider): "), r("Min total count (leave empty to not consider): "), r("Min available count (leave empty to not consider): "), r("Max total count (leave empty to not consider): "), r("Max available count (leave empty to not consider): ")),
+                ["_id", "Title", "Author", "Category", "Total count", "Available count"])
             elif choice == 6:
                 log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "), r("Available count: "))} books to library"
             elif choice == 7:
@@ -96,7 +96,7 @@ def Admin(name, username):
                     books.delbook(_id)
                     log = f"\nSuccessfully the books were deleted"
                 else:
-                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x, r("New available value: (leave empty to not change)"))
+                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x)
                     log = f"\nData edited successfully"
             elif choice == 8:
                 choice = p("", ["List Requests", "Accept request", "Reject request"])
@@ -115,7 +115,7 @@ def Admin(name, username):
                         book = books.findbooks(_id=request["book id"])
                         if book["available count"] == 0:
                             raise Exception("The book is currently unavailable")
-                        books.editbook(request["book id"], available_count=book["available count"] - 1) 
+                        books.editbook(request["book id"], available_count=book["available count"] - 1, loans_num=book["loans"] + 1, loaned=book["loaned"] + 1) 
                         loans.add_loan(request["username"], request["book id"], request["duration"])
                         requests.change_status(request["_id"], "accepted")
                         log = "\nLoan was successful"
@@ -127,10 +127,12 @@ def Admin(name, username):
                     else:
                         loans.del_loan(request["username"], request["book id"])
                         requests.change_status(request["_id"], "accepted")
-                        books.editbook(request["book id"], available_count=book["available count"] + 1) 
+                        books.editbook(request["book id"], available_count=book["available count"] + 1, loans_num=book["loans"] - 1) 
                         log = "\nReturn was successful"
                 elif choice == 3:
                     request = requests.get_request(r("Enter request _id: "))
+                    if request["status"] != "pending":
+                        raise ValueError("This request is not in pending status")
                     requests.change_status(request["_id"], "rejected")
                     log = "\Rejection was successful"
         except SystemExit:
@@ -146,8 +148,8 @@ def Librarian(name, username):
             if choice == 5:
                 return
             elif choice == 1:
-                log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Authore (leave emtpy to not consider): "), r("Categorye (leave emtpy to not consider): "), r("Min total counte (leave emtpy to not consider): "), r("Min available counte (leave emtpy to not consider): "), r("Max total counte (leave emtpy to not consider): "), r("Max available counte (leave emtpy to not consider): ")),
-                ["_id", "Title", "Author", "Total count", "Available count"])
+                log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Author (leave empty to not consider): "), r("Category (leave empty to not consider): "), r("Min total count (leave empty to not consider): "), r("Min available count (leave empty to not consider): "), r("Max total count (leave empty to not consider): "), r("Max available count (leave empty to not consider): ")),
+                ["_id", "Title", "Author", "Category", "Total count", "Available count"])
             elif choice == 2:
                 log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "), r("Available count: "))} books to library"
             elif choice == 3:
@@ -157,7 +159,7 @@ def Librarian(name, username):
                     books.delbook(_id)
                     log = f"\nSuccessfully the books were deleted"
                 else:
-                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x, r("New available value: (leave empty to not change)"))
+                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x)
                     log = f"\nData edited successfully"
             elif choice == 4:
                 choice = p("", ["List Requests", "Accept request", "Reject request"])
@@ -168,7 +170,7 @@ def Librarian(name, username):
                     status = x[status - 1]
                     l = [(books.findbooks(_id=x['book id']) | x) for x in requests.all_requests(uname, status)]
                     log = table(l, ["Username", "Title", "Author", "Type", "Status", "Request date", "Duration", "_id"])
-                elif choice == 5:
+                elif choice == 2:
                     request = requests.get_request(r("Enter request _id: "))
                     if request["status"] != "pending":
                         raise ValueError("This request is not in pending status")
@@ -176,7 +178,7 @@ def Librarian(name, username):
                         book = books.findbooks(_id=request["book id"])
                         if book["available count"] == 0:
                             raise Exception("The book is currently unavailable")
-                        books.editbook(request["book id"], available_count=book["available count"] - 1) 
+                        books.editbook(request["book id"], available_count=book["available count"] - 1, loans_num=book["loans"] + 1, loaned=book["loaned"] + 1)
                         loans.add_loan(request["username"], request["book id"], request["duration"])
                         requests.change_status(request["_id"], "accepted")
                         log = "\nLoan was successful"
@@ -188,10 +190,12 @@ def Librarian(name, username):
                     else:
                         loans.del_loan(request["username"], request["book id"])
                         requests.change_status(request["_id"], "accepted")
-                        books.editbook(request["book id"], available_count=book["available count"] + 1) 
+                        books.editbook(request["book id"], available_count=book["available count"] + 1, loans_num=book["loans"] - 1) 
                         log = "\nReturn was successful"
                 elif choice == 3:
                     request = requests.get_request(r("Enter request _id: "))
+                    if request["status"] != "pending":
+                        raise ValueError("This request is not in pending status")
                     requests.change_status(request["_id"], "rejected")
                     log = "\Rejection was successful"
         except SystemExit:
@@ -207,8 +211,8 @@ def User(name, username):
             if choice == 4:
                 return
             elif choice == 1:
-                log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Authore (leave emtpy to not consider): "), r("Categorye (leave emtpy to not consider): "), r("Min total counte (leave emtpy to not consider): "), r("Min available counte (leave emtpy to not consider): "), r("Max total counte (leave emtpy to not consider): "), r("Max available counte (leave emtpy to not consider): ")),
-                ["_id", "Title", "Author", "Total count", "Available count"])
+                log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Author (leave empty to not consider): "), r("Category (leave empty to not consider): "), r("Min total count (leave empty to not consider): "), r("Min available count (leave empty to not consider): "), r("Max total count (leave empty to not consider): "), r("Max available count (leave empty to not consider): ")),
+                ["_id", "Title", "Author", "Category", "Total count", "Available count"])
             elif choice == 2:
                 loan = loans.my_loans(username)
                 complete = [x | books.findbooks(_id=x["book id"]) for x in loan]
@@ -219,33 +223,30 @@ def User(name, username):
                 if choice == 1:
                     l = [(books.findbooks(_id=x['book id']) | x) for x in requests.myrequests(username)]
                     log = table(l, ["Title", "Author", "Type", "Status", "Request date", "Duration"])
-                elif choice == 2:
+                else:
                     _id = r("_id of book: ")
                     x = books.findbooks(_id=_id)
                     if x == None:
                         raise ValueError("The _id is invalid")
-                    if x['available count'] == 0:
-                        raise ValueError("The book is currently unavailable")
-                    if loans.check_to_loan(username, _id) == True:
-                        raise ValueError("You alredy have this book")
-                    requests.requestloan(username, _id, r("Duration: "))
-                    log = "\nRequest sent successfully"
-                elif choice == 3:
-                    _id = r("_id of book: ")
-                    if books.findbooks(_id=_id) == None:
-                        raise ValueError("The _id is invalid")
-                    if loans.check_to_loan(username, _id) == False:
-                        raise ValueError("You do not have this book")
-                    requests.request_renew(username, _id, r("Duration: "))
-                    log = "\nRequest sent successfully"
-                elif choice == 4:
-                    _id = r("_id of book: ")
-                    if books.findbooks(_id=_id) == None:
-                        raise ValueError("The _id is invalid")
-                    if loans.check_to_loan(username, _id) == False:
-                        raise ValueError("You do not have this book")
-                    requests.request_return(username, _id)
-                    log = "\nRequest sent successfully"
+                    requests.exist(username, _id)
+                    if choice == 2:
+                        if x['available count'] == 0:
+                            raise ValueError("The book is currently unavailable")
+                        if loans.check_to_loan(username, _id) == True:
+                            raise ValueError("You alredy have this book")
+                        requests.requestloan(username, _id, r("Duration: "))
+                        log = "\nRequest sent successfully"
+                    elif choice == 3:
+                        _id = r("_id of book: ")
+                        if loans.check_to_loan(username, _id) == False:
+                            raise ValueError("You do not have this book")
+                        requests.request_renew(username, _id, r("Duration: "))
+                        log = "\nRequest sent successfully"
+                    elif choice == 4:
+                        if loans.check_to_loan(username, _id) == False:
+                            raise ValueError("You do not have this book")
+                        requests.request_return(username, _id)
+                        log = "\nRequest sent successfully"
         except SystemExit:
             raise
         except Exception as e:
