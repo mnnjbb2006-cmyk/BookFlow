@@ -29,7 +29,6 @@ def addbook(title, author, category, total_count):
     try:
         ltitle = title.lower()
         total_count = i(total_count)
-        available_count = i(available_count)
         if total_count == 0:
             raise ValueError("Total count should be postive")
         if books.find_one({"ltitle":ltitle, "author":{"$regex":author + '$', "$options":"i"}}) != None:
@@ -71,6 +70,8 @@ def delbook(_id):
     try:
         _id = o(_id)
         x = books.find_one(_id)
+        if x == None:
+            raise ValueError("_id is invalid")
         loans = x["loans"]
         if loans != 0:
             raise ValueError(f"This book is currnetly loaned by {loans} of useres so total count cant be less than {loans}")
@@ -79,6 +80,7 @@ def delbook(_id):
         e()
 
 def editbook(_id, title="", author="", category="", total_count="", available_count="", loans_num="", loaned="", auto=True):
+    global max_book
     try:
         _id = o(_id)
         x = books.find_one({"_id":_id})
@@ -92,13 +94,15 @@ def editbook(_id, title="", author="", category="", total_count="", available_co
             category = x["category"]
         if total_count == "":
             total_count = x["total count"]
+        max_book = max(max_book, total_count)
         if loaned == "":
-            loaned = x["loand"]
-        loans_num = x["loans"]
+            loaned = x["loaned"]
+        if loans_num == "":
+            loans_num = x["loans"]
         if auto == False:
             if total_count < loans_num:
                 raise ValueError(f"This book is currnetly loaned by {loans_num} of useres so total count cant be less than {loans_num}")
-        available_count = total_count - loans
+            available_count = total_count - loans_num
         ltitle = title.lower()
         x = books.find_one({"ltitle":ltitle, "author":{"$regex":author + "$", "$options":"i"}})
         if x != None and x['_id'] != _id:

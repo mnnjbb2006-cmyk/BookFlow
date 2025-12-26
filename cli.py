@@ -86,17 +86,18 @@ def Admin(name, username):
                     log = f"\nSuccessfully enabled {u}"
             elif choice == 5:
                 log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Author (leave empty to not consider): "), r("Category (leave empty to not consider): "), r("Min total count (leave empty to not consider): "), r("Min available count (leave empty to not consider): "), r("Max total count (leave empty to not consider): "), r("Max available count (leave empty to not consider): ")),
-                ["_id", "Title", "Author", "Category", "Total count", "Available count"])
+                ["_id", "Title", "Author", "Category", "Total count", "Available count", "Loans", "Loaned"])
             elif choice == 6:
-                log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "), r("Available count: "))} books to library"
+                log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "))} books to library"
             elif choice == 7:
                 _id = r("_id: ")
                 x = books.i(r("New total count (enter 0 to delete): "))
                 if x == 0:
                     books.delbook(_id)
+                    requests.del_request(_id)
                     log = f"\nSuccessfully the books were deleted"
                 else:
-                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x)
+                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x, auto=False)
                     log = f"\nData edited successfully"
             elif choice == 8:
                 choice = p("", ["List Requests", "Accept request", "Reject request"])
@@ -125,6 +126,7 @@ def Admin(name, username):
                         requests.change_status(request["_id"], "accepted")
                         log = "\nRenew was successful"
                     else:
+                        book = books.findbooks(_id=request["book id"])
                         loans.del_loan(request["username"], request["book id"])
                         requests.change_status(request["_id"], "accepted")
                         books.editbook(request["book id"], available_count=book["available count"] + 1, loans_num=book["loans"] - 1) 
@@ -149,17 +151,18 @@ def Librarian(name, username):
                 return
             elif choice == 1:
                 log = table(books.findbooks(r("Title (leave emtpy to not consider): "), r("Author (leave empty to not consider): "), r("Category (leave empty to not consider): "), r("Min total count (leave empty to not consider): "), r("Min available count (leave empty to not consider): "), r("Max total count (leave empty to not consider): "), r("Max available count (leave empty to not consider): ")),
-                ["_id", "Title", "Author", "Category", "Total count", "Available count"])
+                ["_id", "Title", "Author", "Category", "Total count", "Available count", "Loans", "Loaned"])
             elif choice == 2:
-                log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "), r("Available count: "))} books to library"
+                log = f"\nSuccessfully addedd {books.addbook(r("Title: "), r("Author: "), r("Category: "), r("Total count: "))} books to library"
             elif choice == 3:
                 _id = r("_id: ")
                 x = books.i(r("New total count (enter 0 to delete): "))
                 if x == 0:
                     books.delbook(_id)
+                    requests.del_request(_id)
                     log = f"\nSuccessfully the books were deleted"
                 else:
-                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x)
+                    books.editbook(_id, r("New Title (leave empty to not change): "), r("New author (leave empty to not change): "), r("New category (leave empty to not change): "), x, auto=False)
                     log = f"\nData edited successfully"
             elif choice == 4:
                 choice = p("", ["List Requests", "Accept request", "Reject request"])
@@ -178,7 +181,7 @@ def Librarian(name, username):
                         book = books.findbooks(_id=request["book id"])
                         if book["available count"] == 0:
                             raise Exception("The book is currently unavailable")
-                        books.editbook(request["book id"], available_count=book["available count"] - 1, loans_num=book["loans"] + 1, loaned=book["loaned"] + 1)
+                        books.editbook(request["book id"], available_count=book["available count"] - 1, loans_num=book["loans"] + 1, loaned=book["loaned"] + 1) 
                         loans.add_loan(request["username"], request["book id"], request["duration"])
                         requests.change_status(request["_id"], "accepted")
                         log = "\nLoan was successful"
@@ -186,8 +189,9 @@ def Librarian(name, username):
                         loans.del_loan(request["username"], request["book id"])
                         loans.add_loan(request["username"], request["book id"], request["duration"])
                         requests.change_status(request["_id"], "accepted")
-                        log = "\Renew was successful"
+                        log = "\nRenew was successful"
                     else:
+                        book = books.findbooks(_id=request["book id"])
                         loans.del_loan(request["username"], request["book id"])
                         requests.change_status(request["_id"], "accepted")
                         books.editbook(request["book id"], available_count=book["available count"] + 1, loans_num=book["loans"] - 1) 

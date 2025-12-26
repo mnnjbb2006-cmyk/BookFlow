@@ -93,3 +93,9 @@ def change_status(_id, status):
         requests.update_one({"_id":_id}, {"$set":{"status":status}})
     except ConnectionFailure:
         e()
+
+def del_request(book_id):
+    try:
+        requests.delete_many({"book id":book_id})
+    except ConnectionFailure:
+        e()
