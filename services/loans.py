@@ -27,6 +27,6 @@ def check_to_loan(username, book_id):
 
 def del_loan(username, book_id):
     try:
-        loans.delete_one({"book id":book_id})
+        loans.delete_one({"username":username, "book id":book_id})
     except ConnectionFailure:
         e()
