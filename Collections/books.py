@@ -69,7 +69,7 @@ def findbooks(title="", author="", category="", min_total="", min_available="", 
 def delbook(_id):
     try:
         _id = o(_id)
-        x = books.find_one(_id)
+        x = findbooks(_id=_id)
         if x == None:
             raise ValueError("_id is invalid")
         loans = x["loans"]

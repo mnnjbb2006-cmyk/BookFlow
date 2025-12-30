@@ -21,7 +21,7 @@ loans = db["loans"]
 users.create_index("username", unique=True)
 books.create_index("ltitle")
 requests.create_index("username")
-loans.create_index("ltitle")
+loans.create_index("username")
 
 if users.find_one({}) == None:
     users.insert_one({"username":"admin", "password":"admin", "name":"admin", "role":"Admin", "status":"enabled"})
