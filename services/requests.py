@@ -1,4 +1,3 @@
-#should import all to all and fix all function in here and in cli
 from db import requests
 from db import e
 from db import ConnectionFailure
@@ -55,13 +54,6 @@ def request_return(username, _id):
         if requests.find_one({"username":username, "book id": _id, "status":"pending", "type":"return"}) != None:
             raise Exception("You have alredy requeted this")
         requests.insert_one({"username":username, "book id":_id, "request date":datetime.now().replace(microsecond=0), "status":"pending", "type":"return"})
-    except ConnectionFailure:
-        e()
-
-def myrequests(username):
-    #search option
-    try:
-        return requests.find({"username":username}, {"_id":0, "username":0}).to_list()
     except ConnectionFailure:
         e()
 
