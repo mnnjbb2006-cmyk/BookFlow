@@ -23,6 +23,7 @@ Install required Python dependencies:
 
 ```bash
 pip install pymongo
+```
 
 ---
 
@@ -33,6 +34,7 @@ pip install pymongo
 To start the BookFlow CLI:
 ```bash
 python cli.py
+```
 
 ---
 
