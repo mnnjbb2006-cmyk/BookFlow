@@ -1,12 +1,52 @@
 # BookFlow
-BookFlow – A modular library management system built with Python. Command‑line first, designed to be extended with graphical interfaces, user authentication, encryption, analytics, and modern APIs in future releases.
 
+BookFlow is a modular library management system built with Python. It provides a clean structure for managing books, users, and borrowing operations, and is designed to be easily extendable with new features such as authentication, encryption, analytics, or modern APIs.
 
+---
 
-To run this app you should first install mongodb on your device and run it on defualt port
+## ✨ Features
 
-install pymonog using:
+- Book management (add, remove, update)
+- User and borrowing request management
+- MongoDB-based data storage
+- Modular and extensible architecture
+- Command-line interface (CLI)
+- Ready for future expansion (GUI, API, dashboards, etc.)
+
+---
+
+## 📦 Requirements
+
+Make sure **MongoDB** is installed and running on its default port.
+
+Install required Python dependencies:
+
+```bash
 pip install pymongo
 
-and run this command to run project:
+## ▶️ How to Run
+
+To start the BookFlow CLI:
+```bash
 python cli.py
+
+## 📁 Project Structure
+BookFlow/
+│
+├── Collections/        # Data models and collections
+├── services/           # Business logic and service layer
+├── cli.py              # Command-line interface
+├── db.py               # Database connection handler
+└── README.md
+
+## 🛠 Planned Features
+
+    Graphical User Interface (GUI) or API
+
+    Data encryption
+
+    Reporting and analytics
+## 🤝 Contributing
+
+Contributions are welcome!
+Feel free to open an Issue or submit a Pull Request.
