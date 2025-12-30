@@ -4,7 +4,7 @@ from db import e
 from bson import ObjectId
 
 max_book = 0
-for x in books.find({}).to_list():
+for x in books.find({}):
     max_book = max(max_book, x["total count"])
 
 def i(x):
@@ -61,15 +61,14 @@ def findbooks(title="", author="", category="", min_total="", min_available="", 
         max_available = i(max_available)
         min_total = i(min_total)
         min_available = i(min_available)
-        #return books.find({"ltitle":{"$regex":title, "$options":"i"}, "author":{"$regex":author, "$options":"i"}}).to_list()
-        return books.find({"ltitle":{"$regex":ltitle}, "author":{"$regex":author, "$options":"i"}, "category":{"$regex":category, "$options":"i"}, "total count":{"$lte":max_total, "$gte":min_total}, "available count":{"$lte":max_available, "$gte":min_available}}).to_list()
+        return list(books.find({"ltitle":{"$regex":ltitle}, "author":{"$regex":author, "$options":"i"}, "category":{"$regex":category, "$options":"i"}, "total count":{"$lte":max_total, "$gte":min_total}, "available count":{"$lte":max_available, "$gte":min_available}}))
     except ConnectionFailure:
         e()
 
 def delbook(_id):
     try:
         _id = o(_id)
-        x = book.find_one({"_id":_id})
+        x = books.find_one({"_id": _id})
         if x == None:
             raise ValueError("_id is invalid")
         loans = x["loans"]

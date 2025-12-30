@@ -2,11 +2,9 @@ from db import users
 from db import ConnectionFailure
 from db import e
 
-#are CRU funcion returning something?
-
 def getusers():
     try:
-        return users.find({}, {"_id":0}).to_list()
+        return list(users.find({}, {"_id": 0}))
     except ConnectionFailure:
         e() 
 

@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 def my_loans(username):
     try:
-        return loans.find({"username":username}, {"_id":0, "username":0}).to_list()
+        return list(loans.find({"username": username}, {"_id": 0, "username": 0}))
     except ConnectionFailure:
         e()
 
@@ -27,6 +27,6 @@ def check_to_loan(username, book_id):
 
 def del_loan(username, book_id):
     try:
-        loans.delete_one({"username":username, "book id":book_id})
+        loans.delete_one({"username": username, "book id": book_id})
     except ConnectionFailure:
         e()

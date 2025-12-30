@@ -28,12 +28,6 @@ def requestloan(username, _id, duration):
     except ConnectionFailure:
         e()
 
-def myrequests(username):
-    try:
-        return requests.find({"username":username}, {"_id":0, "username":0}).to_list()
-    except ConnectionFailure:
-        e()
-
 def exist(username, _id):
     try:
         if requests.find_one({"username":username, "book id":_id, "status":"pending"}, {"_id":0, "username":0}) != None:
@@ -54,6 +48,12 @@ def request_return(username, _id):
         if requests.find_one({"username":username, "book id": _id, "status":"pending", "type":"return"}) != None:
             raise Exception("You have alredy requeted this")
         requests.insert_one({"username":username, "book id":_id, "request date":datetime.now().replace(microsecond=0), "status":"pending", "type":"return"})
+    except ConnectionFailure:
+        e()
+
+def myrequests(username):
+    try:
+        return list(requests.find({"username": username}, {"_id": 0, "username": 0}))
     except ConnectionFailure:
         e()
 
@@ -79,9 +79,6 @@ def get_request(_id):
 def change_status(_id, status):
     try:
         _id = o(_id)
-        #x = requests.find_one({"_id":_id})
-        #if x == None:
-            #raise ValueError("_id is not valid")
         requests.update_one({"_id":_id}, {"$set":{"status":status}})
     except ConnectionFailure:
         e()
