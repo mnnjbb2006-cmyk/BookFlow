@@ -39,6 +39,7 @@ python cli.py
 ---
 
 ## 📁 Project Structure
+```code
 BookFlow/
 │
 ├── Collections/        # Data models and collections
@@ -46,7 +47,7 @@ BookFlow/
 ├── cli.py              # Command-line interface
 ├── db.py               # Database connection handler
 └── README.md
-
+```
 ---
 
 ---
