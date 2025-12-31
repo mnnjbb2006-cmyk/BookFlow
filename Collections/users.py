@@ -13,9 +13,9 @@ def getuser(username):
 
 def adduser(username, password, name, role):
     if username == "" or password == "" or name == "":
-        raise ValueError("Username or password or name can not be empty")
+        raise ValueError("Username, password and name must not be empty")
     if users.find_one({"username":username}) != None:
-        raise ValueError("Username alredy taken")
+        raise ValueError("Username already taken")
     users.insert_one({"username":username, "password":password, "name":name, "role":role, "status":"enabled"})
     return username
 
@@ -29,11 +29,11 @@ def disable(username):
     if x.matched_count == 0:
         raise ValueError("This user does not exist")
     if x.modified_count == 0:
-        raise ValueError("This user was alredy disabled")
+        raise ValueError("This user was already disabled")
 
 def enable(username):
     x = users.update_one({"username":username}, {"$set":{"status":"enabled"}})
     if x.matched_count == 0:
         raise ValueError("This user does not exist")
     if x.modified_count == 0:
-        raise ValueError("This user was alredy enbled")
+        raise ValueError("This user was already enabled")

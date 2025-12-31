@@ -11,7 +11,7 @@ def i(x):
             raise
         return x
     except:
-        raise ValueError("Duration should be a postive integer")
+        raise ValueError("Duration should be a positive integer")
 
 def o(x):
     try:
@@ -22,21 +22,21 @@ def o(x):
 def requestloan(username, _id, duration):
     duration = i(duration)
     if requests.find_one({"username":username, "book id": _id, "status":"pending", "type":"loan"}) != None:
-        raise Exception("You have alredy requeted this")
+        raise Exception("You have already requested this")
     requests.insert_one({"username":username, "book id":_id, "request date":datetime.now().replace(microsecond=0), "duration":duration, "status":"pending", "type":"loan"})
 
 def exist(username, _id):
     if requests.find_one({"username":username, "book id":_id, "status":"pending"}, {"_id":0, "username":0}) != None:
-        raise Exception("You alredy have a pending request on this book")
+        raise Exception("You already have a pending request on this book")
 def request_renew(username, _id, duration):
     duration = i(duration)
     if requests.find_one({"username":username, "book id": _id, "status":"pending", "type":"renew"}) != None:
-        raise Exception("You have alredy requeted this")
+        raise Exception("You have already requested this")
     requests.insert_one({"username":username, "book id":_id, "request date":datetime.now().replace(microsecond=0), "duration":duration, "status":"pending", "type":"renew"})
 
 def request_return(username, _id):
     if requests.find_one({"username":username, "book id": _id, "status":"pending", "type":"return"}) != None:
-        raise Exception("You have alredy requeted this")
+        raise Exception("You have already requested this")
     requests.insert_one({"username":username, "book id":_id, "request date":datetime.now().replace(microsecond=0), "status":"pending", "type":"return"})
 
 def myrequests(username):

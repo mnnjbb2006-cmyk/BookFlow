@@ -9,7 +9,7 @@ def i(x):
             raise
         return x
     except:
-        raise ValueError("Total count should be non-negeative integer")
+        raise ValueError("Total count should be a non-negative integer")
 
 def o(x):
     try:
@@ -19,13 +19,13 @@ def o(x):
 
 def addbook(title, author, category, total_count):
     if title == "" or author == "" or total_count == "":
-        raise ValueError("Inputs can not be empty")
+        raise ValueError("Title, author and total_count must not be empty")
     ltitle = title.lower()
     total_count = i(total_count)
     if total_count == 0:
-        raise ValueError("Total count should be postive")
+        raise ValueError("Total count should be positive")
     if books.find_one({"ltitle":ltitle, "author":{"$regex":author + '$', "$options":"i"}}) != None:
-        raise ValueError("This book is alredy in libraray")
+        raise ValueError("This book already exists in the library")
     books.insert_one({"ltitle":ltitle, "title":title, "author":author, "category":category, "total count":total_count, "available count":total_count, "loans":0, "loaned":0})
     return total_count
 
@@ -72,7 +72,7 @@ def delbook(_id):
         raise ValueError("_id is invalid")
     loans = x["loans"]
     if loans != 0:
-        raise ValueError(f"This book is currnetly loaned by {loans} of useres so total count cant be less than {loans}")
+        raise ValueError(f"This book is currently loaned by {loans} user(s); total count cannot be less than {loans}.")
     books.delete_one({"_id":_id})
 
 def editbook(_id, title="", author="", category="", total_count="", available_count="", loans_num="", loaned="", auto=True):
@@ -94,12 +94,12 @@ def editbook(_id, title="", author="", category="", total_count="", available_co
         loans_num = x["loans"]
     if auto == False:
         if total_count < loans_num:
-            raise ValueError(f"This book is currnetly loaned by {loans_num} of useres so total count cant be less than {loans_num}")
+            raise ValueError(f"This book is currently loaned by {loans_num} user(s); total count cannot be less than {loans_num}.")
         available_count = total_count - loans_num
     ltitle = title.lower()
     x = books.find_one({"ltitle":ltitle, "author":{"$regex":author + "$", "$options":"i"}})
     if x != None and x['_id'] != _id:
-        raise ValueError("There exist another book with same title and author")
+        raise ValueError("Another book with the same title and author already exists")
     x = books.update_one({"_id":_id}, {"$set":{"ltitle":ltitle, "title":title, "author":author, "category":category, "total count":total_count, "available count":available_count, "loans":loans_num, "loaned":loaned}}).modified_count
     if x == 0:
         raise Exception("Nothing has been changed")
