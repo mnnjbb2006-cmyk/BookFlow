@@ -220,12 +220,14 @@ def Admin(name, username):
                     "Find books",
                     "Add books",
                     "Edit books",
+                    "Top loaned books",
+                    "Low-penalty users",
                     "Requests",
                     "Logout",
                 ],
             )
 
-            if choice == 9:
+            if choice == 11:
                 return
             elif choice == 1:
                 log = table(users.getusers(), ["Username", "Name", "Role", "Status", "Penalty"])
@@ -257,6 +259,24 @@ def Admin(name, username):
             elif choice == 7:
                 log = _book_edit_flow()
             elif choice == 8:
+                n = r("How many top books to show (default 10): ")
+                try:
+                    n = int(n)
+                    if n <= 0:
+                        raise ValueError("number of books must be positive integer")
+                except:
+                    n = 10
+                log = table(books.most_loaned(n), BOOK_COLS)
+            elif choice == 9:
+                n = r("How many users to show (default 10): ")
+                try:
+                    n = int(n)
+                    if n <= 0:
+                        raise ValueError("number of books must be positive integer")
+                except:
+                    n = 10
+                log = table(users.low_penalty_users(n), ["Username", "Name", "Penalty"])
+            elif choice == 8:
                 log = _staff_requests_flow()
 
         except ConnectionFailure:
@@ -272,9 +292,9 @@ def Librarian(name, username):
         try:
             choice = p(
                 f"Welcome {name} (Librarian)",
-                ["Find books", "Add books", "Edit books", "Requests", "Logout"],
+                ["Find books", "Add books", "Edit books", "Top loaned books", "Low-penalty users", "Requests", "Logout"],
             )
-            if choice == 5:
+            if choice == 7:
                 return
             elif choice == 1:
                 log = _book_find_flow()
@@ -283,6 +303,24 @@ def Librarian(name, username):
             elif choice == 3:
                 log = _book_edit_flow()
             elif choice == 4:
+                n = r("How many top books to show (default 10): ")
+                try:
+                    n = int(n)
+                    if n <= 0:
+                        raise ValueError("number of books must be positive integer")
+                except:
+                    n = 10
+                log = table(books.most_loaned(n), BOOK_COLS)
+            elif choice == 5:
+                n = r("How many users to show (default 10): ")
+                try:
+                    n = int(n)
+                    if n <= 0:
+                        raise ValueError("number of books must be positive integer")
+                except:
+                    n = 10
+                log = table(users.low_penalty_users(n), ["Username", "Name", "Penalty"])
+            elif choice == 6:
                 log = _staff_requests_flow()
 
         except ConnectionFailure:
@@ -296,8 +334,8 @@ def User(name, username):
     # User menu (UI): search books, view loans, create requests.
     while True:
         try:
-            choice = p(f"Welcome {name} (User)", ["Find books", "My loans", "Requests", "My penalty", "Logout"])
-            if choice == 5:
+            choice = p(f"Welcome {name} (User)", ["Find books", "My loans", "Requests", "My penalty", "Top loaned books","Logout"])
+            if choice == 6:
                 return
             elif choice == 1:
                 log = _book_find_flow()
@@ -345,8 +383,16 @@ def User(name, username):
                     pen = users.update_penalty(username, loan.get("return date"))
                     requests.request_return(username, _id)
                     log = f"\nRequest sent successfully and {pen} penalty added"
-
-            elif choice == 4:
+            elif choice == 5:
+                n = r("How many users to show (default 10): ")
+                try:
+                    n = int(n)
+                    if n <= 0:
+                        raise ValueError("number of books must be positive integer")
+                except:
+                    n = 10
+                log = table(users.low_penalty_users(n), ["Username", "Name", "Penalty"])
+            elif choice == 5:
                 pen = users.getuser(username, penalty=True)
                 log = f"\nYour current penalty: {pen}"
         

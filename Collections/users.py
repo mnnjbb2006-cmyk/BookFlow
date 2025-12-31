@@ -56,6 +56,12 @@ def adduser(username, password, name, role):
     return username
 
 
+def low_penalty_users(limit=10):
+    # Return list of users whose role == 'User', sorted by penalty ascending (lowest first).
+    rows = list(users.find({"role": "User"}, {"password": 0, "_id": 0, "role": 0, "status": 0}).sort("penalty", 1).limit(int(limit)))
+    return rows
+
+
 def verify_password(username, password):
     """Return True if the provided password matches the stored hash."""
     x = users.find_one({"username": username})

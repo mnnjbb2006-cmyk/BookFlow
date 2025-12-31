@@ -71,6 +71,15 @@ def findbooks(title="", author="", category="", min_total="", min_available="", 
 
     return list(books.find(query))
 
+
+def most_loaned(limit=10):
+    # Return a list of up to `limit` books sorted by the 'loaned' field descending.
+
+    try:
+        return list(books.find({}).sort("loaned", -1).limit(int(limit)))
+    except Exception:
+        return []
+
 def delbook(_id):
     # Delete a book; prevent deletion when active loans exist.
     _id = o(_id)
