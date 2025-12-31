@@ -159,8 +159,8 @@ def _staff_requests_flow():
                 raise Exception("The book is currently unavailable")
             books.editbook(
                 book_id,
-                available_count=book.book["available count"] - 1,
-                loans_num=book.book["loans"] + 1,
+                available_count=book["available count"] - 1,
+                loans_num=book["loans"] + 1,
                 loaned=book["loaned"] + 1,
             )
             loans.add_loan(uname, book_id, req.get("duration"))
@@ -296,10 +296,12 @@ def User(name, username):
                 if sub == 1:
                     reqs = requests.myrequests(username)
                     merged = [_merge_book_into_request(x) for x in reqs]
-                    log = table(merged, BOOK_COLS)
+                    log = table(merged, ["Title", "Author", "Type", "Status", "Request date", "Duration", "Book id"])
                     continue
 
                 _id = r("_id of book: ")
+                if(_id == ""):
+                    raise ValueError("_id can not be empty")
                 b = books.findbooks(_id=_id)
 
                 if sub == 2:
