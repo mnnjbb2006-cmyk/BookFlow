@@ -357,10 +357,9 @@ while True:
     try:
         username = r("Username: ")
         password = r("Password: ")
-        x = users.getuser(username)
 
-        if x.get("password") != password:
-            raise ValueError("This user does not exist")
+        # verify hashed password using helper and get user data
+        x = users.verify_password(username, password)
 
         if x.get("status") == "disabled":
             raise Exception("This user is disabled")

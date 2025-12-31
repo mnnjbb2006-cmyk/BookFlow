@@ -1,6 +1,7 @@
 from db import users
 from db import ConnectionFailure
 from db import e
+import hashlib
 
 """Helpers for the `users` collection (validation wrappers)."""
 
@@ -20,8 +21,19 @@ def adduser(username, password, name, role):
         raise ValueError("Username, password and name must not be empty")
     if users.find_one({"username": username}) != None:
         raise ValueError("Username already taken")
-    users.insert_one({"username": username, "password": password, "name": name, "role": role, "status": "enabled"})
+    # store hashed password
+    hashed = hashlib.sha256(password.encode()).hexdigest()
+    users.insert_one({"username": username, "password": hashed, "name": name, "role": role, "status": "enabled"})
     return username
+
+
+def verify_password(username, password):
+    """Return True if the provided password matches the stored hash."""
+    x = users.find_one({"username": username})
+    if x is None or x.get("password") != hashlib.sha256(password.encode()).hexdigest():
+        raise ValueError("This user does not exist")
+    hashed = hashlib.sha256(password.encode()).hexdigest()
+    return x 
 
 def deluser(username):
     x = users.delete_one({"username":username}).deleted_count
@@ -41,3 +53,9 @@ def enable(username):
         raise ValueError("This user does not exist")
     if x.modified_count == 0:
         raise ValueError("This user was already enabled")
+
+if users.find_one({}) == None:
+    # create default admin with hashed password
+    admin_hashed = hashlib.sha256("admin".encode()).hexdigest()
+    adduser("admin", "admin", "admin", "Admin")
+    print("Default admin user created (username: admin, password: admin)")
