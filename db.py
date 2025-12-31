@@ -3,7 +3,10 @@ from pymongo.errors import ConnectionFailure
 
 def e():
         print(f"Can not connect to database make sure mongodb is running on default port")
-        client.close()
+        try:
+            client.close()
+        except:
+            pass
         exit()
 
 try:
