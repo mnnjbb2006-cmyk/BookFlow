@@ -61,3 +61,6 @@ def change_status(_id, status):
 
 def del_request(book_id):
     requests.delete_many({"book id":book_id})
+
+def del_request_user(username):
+    requests.delete_many({"username":username})

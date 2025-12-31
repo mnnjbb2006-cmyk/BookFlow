@@ -223,6 +223,9 @@ def Admin(name, username):
                 u = r("Username: ")
                 if u == username:
                     raise ValueError("You can not delete yourself")
+                if loans.my_loans(u) != []:
+                    raise Exception("This user has active loans; cannot delete.")
+                requests.del_request_user(u)
                 users.deluser(u)
                 log = f"\nSuccessfully {u} was deleted"
             elif choice == 4:
