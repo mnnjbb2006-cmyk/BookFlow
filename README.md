@@ -17,49 +17,64 @@ BookFlow is a modular library management system built with Python. It provides a
 
 ## 📦 Requirements
 
-Make sure **MongoDB** is installed and running on its default port.
+This project requires Python 3.8+ and a running MongoDB instance.
 
-Install required Python dependencies:
+- Python (3.8+)
+- MongoDB server
+- Python dependencies listed in `requirements.txt`
+
+Install Python dependencies into a virtual environment:
 
 ```bash
-pip install pymongo
+# create and activate a venv (Linux/macOS)
+python -m venv BookFlowVenv
+source BookFlowVenv/bin/activate
+
+# install dependencies
+pip install -r requirements.txt
 ```
 
+Official MongoDB installation instructions are available here:
+
+- MongoDB manual installation guide: https://www.mongodb.com/docs/manual/installation/
+
+For platform-specific packages and installers (Windows, macOS, Linux), follow the link above and pick the section for your OS. If you prefer using a hosted option, see MongoDB Atlas: https://www.mongodb.com/cloud/atlas
 
 ---
 
 ## ▶️ How to Run
 
-To start the BookFlow CLI:
+After installing dependencies and ensuring MongoDB is running on the default port (27017), start the CLI:
+
 ```bash
 python cli.py
 ```
+
+If the project needs a different MongoDB connection string (e.g., remote server or Atlas), update `db.py` accordingly.
+
 ---
 
 ## 📁 Project Structure
-```code
+```text
 BookFlow/
 │
 ├── Collections/        # Data models and collections
 ├── services/           # Business logic and service layer
 ├── cli.py              # Command-line interface
 ├── db.py               # Database connection handler
+├── requirements.txt    # Python dependencies
 └── README.md
 ```
----
 
+---
 
 ## 🛠 Planned Features
 
-    Graphical User Interface (GUI) or API
+- Graphical User Interface (GUI) or API
+- Data encryption
 
-    Data encryption
-
-    Reporting and analytics
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome!
-Feel free to open an Issue or submit a Pull Request.
-
+Contributions are welcome! Feel free to open an Issue or submit a Pull Request.
