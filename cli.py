@@ -5,11 +5,14 @@ from services import requests
 from Collections import books
 from Collections import users
 
+"""CLI for BookFlow — UI layer that calls Collections and services."""
+
 def clear():
     print("\033[2J\033[H", end="")
 
 
 def table(rows, cols):
+    # Render rows (iterable of dicts) into a simple text table.
     if not rows:
         print("No data.")
         return ""
@@ -35,6 +38,7 @@ def table(rows, cols):
 
 
 def r(prompt):
+    # Read a trimmed input line and reject '$' characters.
     x = input(prompt).strip()
     for c in x:
         if c == "$":
@@ -48,6 +52,7 @@ log = ""
 def p(prompt, options):
     global log
 
+    # Show a numbered menu and return the selected index.
     while True:
         clear()
         print("\n" + prompt + log)
@@ -74,6 +79,7 @@ BOOK_COLS = ["_id", "Title", "Author", "Category", "Total count", "Available cou
 
 
 def _book_find_flow():
+    """Prompt for book search criteria and display results."""
     title = r("Title (leave empty to not consider): ")
     author = r("Author (leave empty to not consider): ")
     category = r("Category (leave empty to not consider): ")
@@ -95,6 +101,7 @@ def _book_find_flow():
 
 
 def _book_add_flow():
+    """Prompt and add a book; return a success message."""
     added = books.addbook(
         r("Title: "),
         r("Author: "),
@@ -105,6 +112,7 @@ def _book_add_flow():
 
 
 def _book_edit_flow():
+    """Edit a book or delete it when new total is 0."""
     _id = r("_id: ")
     new_total = books.i(r("New total count (enter 0 to delete): "))
 
@@ -129,11 +137,13 @@ def _book_edit_flow():
 
 
 def _merge_book_into_request(req):
+    """Attach book fields to a request dict for display."""
     info = books.findbooks(_id=req.get("book id", ""))
     return {**info, **req}
 
 
 def _staff_requests_flow():
+    """List/accept/reject requests (staff operations)."""
     sub = p("", ["List Requests", "Accept request", "Reject request"])
     if sub == 1:
         uname = r("Username (leave empty to not consider): ")
@@ -193,6 +203,7 @@ def _staff_requests_flow():
 
 def Admin(name, username):
     global log
+    # Admin menu (UI): calls Collections/services based on choice.
     while True:
         try:
             choice = p(
@@ -252,6 +263,7 @@ def Admin(name, username):
 
 def Librarian(name, username):
     global log
+    # Librarian menu (UI): book management and requests.
     while True:
         try:
             choice = p(
@@ -277,6 +289,7 @@ def Librarian(name, username):
 
 def User(name, username):
     global log
+    # User menu (UI): search books, view loans, create requests.
     while True:
         try:
             choice = p(f"Welcome {name} (User)", ["Find books", "My loans", "Requests", "Logout"])

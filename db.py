@@ -1,13 +1,17 @@
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
+"""Database connection: expose `users`, `books`, `requests`, `loans`."""
+
 def e():
-        print("Cannot connect to the database; make sure MongoDB is running on the default port.")
-        try:
-            client.close()
-        except Exception:
-            pass
-        exit(1)
+    # Print a helpful error and exit (safely try to close client).
+    print("Cannot connect to the database; make sure MongoDB is running on the default port.")
+    try:
+        client.close()
+    except Exception:
+        # If client doesn't exist or close fails we silently continue
+        pass
+    exit()
 
 try:
     client = MongoClient("mongodb://localhost/?directConnection=true", serverSelectionTimeoutMS=2000)

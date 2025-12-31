@@ -2,7 +2,10 @@ from db import books
 from db import ConnectionFailure
 from bson import ObjectId
 
+"""Helpers for the `books` collection (validation and CRUD helpers)."""
+
 def i(x):
+    # Convert to int and ensure non-negative; raise ValueError on fail.
     try:
         x = int(x)
         if x < 0:
@@ -12,12 +15,14 @@ def i(x):
         raise ValueError("Total count should be a non-negative integer")
 
 def o(x):
+    # Convert a string to bson.ObjectId; raise ValueError on failure.
     try:
         return ObjectId(x)
     except:
         raise ValueError("_id is invalid")
 
 def addbook(title, author, category, total_count):
+    # Add a new book to the collection; validate inputs first.
     if title == "" or author == "" or total_count == "":
         raise ValueError("Title, author and total_count must not be empty")
     ltitle = title.lower()
@@ -30,9 +35,10 @@ def addbook(title, author, category, total_count):
     return total_count
 
 def findbooks(title="", author="", category="", min_total="", min_available="", max_total="", max_available="", _id=""):
+    # Find books by filters. If `_id` provided return single book.
     if _id != "":
-        _id = o(_id) 
-        x = books.find_one({"_id":_id})
+        _id = o(_id)
+        x = books.find_one({"_id": _id})
         if x == None:
             raise ValueError("This book does not exist")
         return x
@@ -66,6 +72,7 @@ def findbooks(title="", author="", category="", min_total="", min_available="", 
     return list(books.find(query))
 
 def delbook(_id):
+    # Delete a book; prevent deletion when active loans exist.
     _id = o(_id)
     x = books.find_one({"_id": _id})
     if x == None:
@@ -73,11 +80,12 @@ def delbook(_id):
     loans = x["loans"]
     if loans != 0:
         raise ValueError(f"This book is currently loaned by {loans} user(s); total count cannot be less than {loans}.")
-    books.delete_one({"_id":_id})
+    books.delete_one({"_id": _id})
 
 def editbook(_id, title="", author="", category="", total_count="", available_count="", loans_num="", loaned="", auto=True):
+    # Edit book metadata. When auto=False, available_count = total_count - loans_num.
     _id = o(_id)
-    x = books.find_one({"_id":_id})
+    x = books.find_one({"_id": _id})
     if x == None:
         raise ValueError("This book does not exist")
     if title == "":
