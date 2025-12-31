@@ -25,7 +25,6 @@ Install required Python dependencies:
 pip install pymongo
 ```
 
----
 
 ---
 
@@ -35,7 +34,6 @@ To start the BookFlow CLI:
 ```bash
 python cli.py
 ```
-
 ---
 
 ## 📁 Project Structure
@@ -50,7 +48,6 @@ BookFlow/
 ```
 ---
 
----
 
 ## 🛠 Planned Features
 
@@ -66,4 +63,3 @@ BookFlow/
 Contributions are welcome!
 Feel free to open an Issue or submit a Pull Request.
 
----
