@@ -179,7 +179,7 @@ def _staff_requests_flow():
         books.editbook(
             book_id,
             available_count=book.get("available count", 0) + 1,
-            loans_num=book.get("loans", 0),
+            loans_num=book.get("loans", 0) - 1,
         )
         requests.change_status(req.get("_id"), "accepted")
         return "\nReturn was successful"
