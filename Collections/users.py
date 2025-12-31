@@ -21,8 +21,13 @@ def adduser(username, password, name, role):
         raise ValueError("Username, password and name must not be empty")
     if users.find_one({"username": username}) != None:
         raise ValueError("Username already taken")
-    # store hashed password
-    hashed = hashlib.sha256(password.encode()).hexdigest()
+    # store hashed password (guard against invalid encoding inputs)
+    try:
+        b = password.encode('utf-8')
+    except:
+        # Friendly message for admin/user if their input cannot be encoded
+        raise ValueError("Password must be valid UTF-8 text")
+    hashed = hashlib.sha256(b).hexdigest()
     users.insert_one({"username": username, "password": hashed, "name": name, "role": role, "status": "enabled"})
     return username
 
@@ -30,10 +35,15 @@ def adduser(username, password, name, role):
 def verify_password(username, password):
     """Return True if the provided password matches the stored hash."""
     x = users.find_one({"username": username})
-    if x is None or x.get("password") != hashlib.sha256(password.encode()).hexdigest():
+    # ensure password can be encoded before hashing
+    try:
+        b = password.encode('utf-8')
+    except:
+        raise ValueError("Password must be valid UTF-8 text")
+
+    if x is None or x.get("password") != hashlib.sha256(b).hexdigest():
         raise ValueError("This user does not exist")
-    hashed = hashlib.sha256(password.encode()).hexdigest()
-    return x 
+    return x
 
 def deluser(username):
     x = users.delete_one({"username":username}).deleted_count
