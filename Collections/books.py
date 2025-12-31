@@ -2,10 +2,6 @@ from db import books
 from db import ConnectionFailure
 from bson import ObjectId
 
-max_book = 0
-for x in books.find({}):
-    max_book = max(max_book, x["total count"])
-
 def i(x):
     try:
         x = int(x)
@@ -22,7 +18,6 @@ def o(x):
         raise ValueError("_id is invalid")
 
 def addbook(title, author, category, total_count):
-    global max_book
     if title == "" or author == "" or total_count == "":
         raise ValueError("Inputs can not be empty")
     ltitle = title.lower()
@@ -32,31 +27,43 @@ def addbook(title, author, category, total_count):
     if books.find_one({"ltitle":ltitle, "author":{"$regex":author + '$', "$options":"i"}}) != None:
         raise ValueError("This book is alredy in libraray")
     books.insert_one({"ltitle":ltitle, "title":title, "author":author, "category":category, "total count":total_count, "available count":total_count, "loans":0, "loaned":0})
-    max_book += total_count
     return total_count
 
 def findbooks(title="", author="", category="", min_total="", min_available="", max_total="", max_available="", _id=""):
-    global max_book
     if _id != "":
         _id = o(_id) 
         x = books.find_one({"_id":_id})
         if x == None:
             raise ValueError("This book does not exist")
         return x
-    ltitle = title.lower()
-    if max_total == "":
-        max_total = max_book
-    if max_available == "":
-        max_available = max_book
-    if min_total == "":
-        min_total = 0
-    if min_available == "":
-        min_available = 0
-    max_total = i(max_total)
-    max_available = i(max_available)
-    min_total = i(min_total)
-    min_available = i(min_available)
-    return list(books.find({"ltitle":{"$regex":ltitle}, "author":{"$regex":author, "$options":"i"}, "category":{"$regex":category, "$options":"i"}, "total count":{"$lte":max_total, "$gte":min_total}, "available count":{"$lte":max_available, "$gte":min_available}}))
+    query = {}
+
+    if title != "":
+        query["ltitle"] = {"$regex": title.lower()}
+
+    if author != "":
+        query["author"] = {"$regex": author, "$options": "i"}
+
+    if category != "":
+        query["category"] = {"$regex": category, "$options": "i"}
+
+    total_range = {}
+    if min_total != "":
+        total_range["$gte"] = i(min_total)
+    if max_total != "":
+        total_range["$lte"] = i(max_total)
+    if total_range:
+        query["total count"] = total_range
+
+    avail_range = {}
+    if min_available != "":
+        avail_range["$gte"] = i(min_available)
+    if max_available != "":
+        avail_range["$lte"] = i(max_available)
+    if avail_range:
+        query["available count"] = avail_range
+
+    return list(books.find(query))
 
 def delbook(_id):
     _id = o(_id)
@@ -69,7 +76,6 @@ def delbook(_id):
     books.delete_one({"_id":_id})
 
 def editbook(_id, title="", author="", category="", total_count="", available_count="", loans_num="", loaned="", auto=True):
-    global max_book
     _id = o(_id)
     x = books.find_one({"_id":_id})
     if x == None:
@@ -82,7 +88,6 @@ def editbook(_id, title="", author="", category="", total_count="", available_co
         category = x["category"]
     if total_count == "":
         total_count = x["total count"]
-    max_book = max(max_book, total_count)
     if loaned == "":
         loaned = x["loaned"]
     if loans_num == "":
