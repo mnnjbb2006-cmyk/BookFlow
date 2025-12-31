@@ -1,10 +1,10 @@
 import db
+from db import ConnectionFailure
 from services import loans
 from services import requests
 from Collections import books
 from Collections import users
 
-#mongo db handles string conversion to object id
 def clear():
     print("\033[2J\033[H", end="")
 
@@ -241,8 +241,8 @@ def Admin(name, username):
             elif choice == 8:
                 log = _staff_requests_flow()
 
-        except SystemExit:
-            raise
+        except ConnectionFailure:
+            db.e()
         except Exception as e:
             log = f"\nError: {e}"
 
@@ -266,8 +266,8 @@ def Librarian(name, username):
             elif choice == 4:
                 log = _staff_requests_flow()
 
-        except SystemExit:
-            raise
+        except ConnectionFailure:
+            db.e()
         except Exception as e:
             log = f"\nError: {e}"
 
@@ -322,8 +322,8 @@ def User(name, username):
                     requests.request_return(username, _id)
                     log = "\nRequest sent successfully"
 
-        except SystemExit:
-            raise
+        except ConnectionFailure:
+            db.e()
         except Exception as e:
             log = f"\nError: {e}"
 
@@ -356,5 +356,7 @@ while True:
 
     except SystemExit:
         raise
+    except ConnectionFailure:
+        db.e()
     except Exception as e:
         log = f"\nError: {e}"
