@@ -1,15 +1,39 @@
 from db import users
 from db import ConnectionFailure
 from db import e
+from datetime import datetime, date
 import hashlib
 
 """Helpers for the `users` collection (validation wrappers)."""
 
 def getusers():
-    return list(users.find({}, {"_id": 0}))
+    rows = list(users.find({}, {"_id": 0}))
+    # ensure penalty field exists for display (backwards compatible)
+    for r in rows:
+        if "penalty" not in r:
+            r["penalty"] = 0
+    return rows
 
-def getuser(username):
+
+def update_penalty(username, return_date):
+    # Compute days late from `return_date` and add to user's penalty counter.
+    if return_date is None:
+        return 0
+    # normalize to a date
+    rd = return_date.date()
+
+    today = date.today()
+    days_late = (today - rd).days
+    if days_late <= 0:
+        return 0
+
+    users.update_one({"username": username}, {"$inc": {"penalty": days_late}})
+    return days_late
+
+def getuser(username, penalty=False):
     # Return a user document or raise ValueError if not found.
+    if penalty:
+        return users.find_one({"username": username}, {"penalty": 1, "_id": 0})["penalty"]
     x = users.find_one({"username": username})
     if x == None:
         raise ValueError("This user does not exist")
@@ -28,7 +52,7 @@ def adduser(username, password, name, role):
         # Friendly message for admin/user if their input cannot be encoded
         raise ValueError("Password must be valid UTF-8 text")
     hashed = hashlib.sha256(b).hexdigest()
-    users.insert_one({"username": username, "password": hashed, "name": name, "role": role, "status": "enabled"})
+    users.insert_one({"username": username, "password": hashed, "name": name, "role": role, "status": "enabled", "penalty": 0})
     return username
 
 

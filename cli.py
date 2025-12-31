@@ -178,6 +178,8 @@ def _staff_requests_flow():
             return "\nLoan was successful"
 
         if rtype == "renew":
+            loan = loans.loans.find_one({"username": uname, "book id": book_id})
+            users.update_penalty(uname, loan.get("return date"))
             loans.del_loan(uname, book_id)
             loans.add_loan(uname, book_id, req.get("duration"))
             requests.change_status(req.get("_id"), "accepted")
@@ -197,6 +199,8 @@ def _staff_requests_flow():
     req = requests.get_request(r("Enter request _id: "))
     if req.get("status") != "pending":
         raise ValueError("This request is not in pending status")
+    if req.get("type") == "return":
+        raise Exception("Return requests cannot be rejected")
     requests.change_status(req.get("_id"), "rejected")
     return "\nRejection was successful"
 
@@ -224,7 +228,7 @@ def Admin(name, username):
             if choice == 9:
                 return
             elif choice == 1:
-                log = table(users.getusers(), ["Username", "Name", "Role", "Status"])
+                log = table(users.getusers(), ["Username", "Name", "Role", "Status", "Penalty"])
             elif choice == 2:
                 roles = ["Admin", "Librarian", "User"]
                 role = roles[p("Select role:", roles) - 1]
@@ -292,8 +296,8 @@ def User(name, username):
     # User menu (UI): search books, view loans, create requests.
     while True:
         try:
-            choice = p(f"Welcome {name} (User)", ["Find books", "My loans", "Requests", "Logout"])
-            if choice == 4:
+            choice = p(f"Welcome {name} (User)", ["Find books", "My loans", "Requests", "My penalty", "Logout"])
+            if choice == 5:
                 return
             elif choice == 1:
                 log = _book_find_flow()
@@ -303,7 +307,7 @@ def User(name, username):
                 for x in loan_rows:
                     info = books.findbooks(_id=x.get("book id", ""))
                     complete.append({**info, **x})
-                log = table(complete, BOOK_COLS)
+                log = table(complete, BOOK_COLS + ["Accepted date", "Return date"])
             elif choice == 3:
                 sub = p("", ["My Requests", "Request loan", "Request renew", "Request return", "Back"])
                 if sub == 5:
@@ -335,11 +339,17 @@ def User(name, username):
                     log = "\nRequest sent successfully"
 
                 elif sub == 4:
-                    if not loans.check_to_loan(username, _id):
+                    loan = loans.loans.find_one({"username": username, "book id": _id})
+                    if loan is None:
                         raise ValueError("You do not have this book")
+                    pen = users.update_penalty(username, loan.get("return date"))
                     requests.request_return(username, _id)
-                    log = "\nRequest sent successfully"
+                    log = f"\nRequest sent successfully and {pen} penalty added"
 
+            elif choice == 4:
+                pen = users.getuser(username, penalty=True)
+                log = f"\nYour current penalty: {pen}"
+        
         except ConnectionFailure:
             db.e()
         except Exception as e:
