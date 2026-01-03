@@ -276,7 +276,7 @@ def Admin(name, username):
                 except:
                     n = 10
                 log = table(users.low_penalty_users(n), ["Username", "Name", "Penalty"])
-            elif choice == 8:
+            elif choice == 10:
                 log = _staff_requests_flow()
 
         except ConnectionFailure:
@@ -392,7 +392,7 @@ def User(name, username):
                 except:
                     n = 10
                 log = table(users.low_penalty_users(n), ["Username", "Name", "Penalty"])
-            elif choice == 5:
+            elif choice == 4:
                 pen = users.getuser(username, penalty=True)
                 log = f"\nYour current penalty: {pen}"
         
