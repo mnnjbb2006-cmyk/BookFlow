@@ -729,8 +729,9 @@ class Ui_MainWindow(object):
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
 
     def del_user(self):
-        #should check not youself
         try:
+            if self.selected_username == self.username:
+                raise Exception("You cannot delete yourself")
             if loans.my_loans(self.selected_username) != []:
                 raise Exception("This user has active loans; cannot delete.")
             requests.del_request_user(self.selected_username)
@@ -750,6 +751,8 @@ class Ui_MainWindow(object):
     
     def disable_user(self):
         try:
+            if selected_username == self.username:
+                raise Exception("You cannot disable yourself")
             users.disable(self.selected_username)
             QtWidgets.QMessageBox.information(None, "Success", "User disabled successfully")
             self.refresh_users()

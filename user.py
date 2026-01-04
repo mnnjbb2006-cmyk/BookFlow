@@ -333,18 +333,17 @@ class Ui_MainWindow(object):
         self.set_actions()
 ################ set actions ##########################################################################################################################################################################
     def set_actions(self):
-        ###################### /tab Browse/ ############################
-
         self.refresh_books()
         self.refresh_lonas()
         self.refresh_requests()
+        self.refresh_top_books()
         self.pushButtonSearch.clicked.connect(self.find_books)
         self.pushButtonClear.clicked.connect(self.clear)
         self.tableWidgetBrowse.itemSelectionChanged.connect(self.Borwse_selection_changed)
         self.pushButtonloan.clicked.connect(self.loan)
         self.pushButtonRefreshLonas.clicked.connect(self.refresh_lonas)
         self.pushButtonRefreshRequests.clicked.connect(self.refresh_requests)
-        ###################### /tab Loans/ ############################
+        self.pushButtonRefreshTopbooks.clicked.connect(self.refresh_top_books)
 
 ################ functions ##########################################################################################################################################################################
 
@@ -453,6 +452,19 @@ class Ui_MainWindow(object):
             QtWidgets.QMessageBox.information(None, "Success", "Return request sent successfully")
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
+
+    def refresh_top_books(self):
+        self.tableWidgetTopbooks.setRowCount(0)
+        for book in books.most_loaned(self.spinBoxTopbooks.value()):
+            rowPosition = self.tableWidgetTopbooks.rowCount()
+            self.tableWidgetTopbooks.insertRow(rowPosition)
+            self.tableWidgetTopbooks.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+            self.tableWidgetTopbooks.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+            self.tableWidgetTopbooks.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+            self.tableWidgetTopbooks.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+            self.tableWidgetTopbooks.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+            self.tableWidgetTopbooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
+            self.tableWidgetTopbooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
