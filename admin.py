@@ -526,6 +526,7 @@ class Ui_MainWindow(object):
         self.setupActions()
         self.refresh_users()
         self.refresh_books()
+        self.load_requests()
     def setupActions(self):
         ###############       /tab users/              #####################################
         #refresh bution should be removed
@@ -558,6 +559,9 @@ class Ui_MainWindow(object):
         self.tableWidgetRequests.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tableWidgetRequests.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.tableWidgetRequests.itemSelectionChanged.connect(self.request_selection_changed)
+        self.pushButtonAccept.clicked.connect(self.accept_request)
+        self.pushButtonLoad.clicked.connect(self.load_requests)
+        self.pushButtonReject.clicked.connect(self.reject_request)
         ###############       /tab reports/              #####################################
         #clear buttion should be deleted
         self.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
@@ -576,6 +580,26 @@ class Ui_MainWindow(object):
 
 #####################           /functions/                   ###################################################################################################################################################
 
+    def load_requests(self):
+        self.tableWidgetRequests.setRowCount(0)
+        u = self.lineEditUsername2.text()
+        status = self.comboBoxStatus.currentText().lower()
+        for request in requests.all_requests(u, status):
+            book = books.findbooks(_id=request.get("book id", ""))
+            rowPosition = self.tableWidgetRequests.rowCount()
+            self.tableWidgetRequests.insertRow(rowPosition)
+            self.tableWidgetRequests.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(request.get("username", "")))
+            self.tableWidgetRequests.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("title", "")))
+            self.tableWidgetRequests.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("author", "")))
+            self.tableWidgetRequests.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(book.get("category", "")))
+            self.tableWidgetRequests.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+            self.tableWidgetRequests.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+            self.tableWidgetRequests.setItem(rowPosition , 7, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
+            self.tableWidgetRequests.setItem(rowPosition , 8, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+            self.tableWidgetRequests.setItem(rowPosition , 9, QtWidgets.QTableWidgetItem(str(request.get("type", ""))))
+            self.tableWidgetRequests.setItem(rowPosition , 10, QtWidgets.QTableWidgetItem(str(request.get("status", ""))))
+            self.tableWidgetRequests.setItem(rowPosition , 11, QtWidgets.QTableWidgetItem(str(request.get("request date", ""))))
+            self.tableWidgetRequests.setItem(rowPosition , 12, QtWidgets.QTableWidgetItem(str(request.get("duration", ""))))
     def refresh_top_books(self):
         self.tableWidget.setRowCount(0)
         for book in books.most_loaned(self.spinBoxLoaned.value()):
@@ -635,11 +659,54 @@ class Ui_MainWindow(object):
             self.selected_book = None
     
     def request_selection_changed(self):
-        selected_rows = self.tableWidgetRequests.selectionModel().selectedRows()
-        if selected_rows:
-            self.selected_request = selected_rows[0]
-        else:
-            self.selected_request = None
+        row = self.tableWidgetRequests.currentRow()
+        if row == -1 or self.tableWidgetRequests.item(row, 10).text() != "pending":
+            self.pushButtonAccept.setEnabled(False)
+            self.pushButtonReject.setEnabled(False)
+            return
+        self.req_username = self.tableWidgetRequests.item(row, 0).text()
+        self.req_book_title = self.tableWidgetRequests.item(row, 1).text()
+        self.req_book_author = self.tableWidgetRequests.item(row, 2).text()
+        self.pushButtonAccept.setEnabled(True)
+        self.pushButtonReject.setEnabled(True)
+
+    def accept_request(self):
+        try:
+            book_id = books.find_id(title=self.req_book_title, author=self.req_book_author)
+            request = requests.find_request(self.req_username, book_id)
+            book = books.findbooks(_id=book_id)
+            if request.get("type") == "loan":
+                if book["available count"] == 0:
+                    raise Exception("This book is not available")
+                books.editbook(available_count=book["available count"] - 1, loans_num=book["loans"] + 1, _id=request.get("book id", ""), loaned=book["loaned"] + 1)
+                loans.add_loan(self.req_username, request.get("book id", ""), request.get("duration", ""))
+            elif request.get("type") == "return":
+                books.editbook(available_count=book["available count"] + 1, loans_num=book["loans"] - 1, _id=request.get("book id", ""))
+                loans.del_loan(self.req_username, request.get("book id", ""))
+            elif request.get("type") == "renew":
+                books.editbook(_id=request.get("book id", ""), loaned=book["loaned"] + 1, available_count=book["available count"])
+                loans.del_loan(self.req_username, request.get("book id", ""))
+                loans.add_loan(self.req_username, request.get("book id", ""), request.get("duration", ""))
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
+            return
+        requests.change_status(request.get("_id", ""), "accepted")
+        self.load_requests()
+        self.refresh_books()
+        QtWidgets.QMessageBox.information(None, "Success", "Request accepted")
+
+    def reject_request(self):
+        try:
+            book_id = books.find_id(title=self.req_book_title, author=self.req_book_author)
+            request = requests.find_request(self.req_username, book_id)
+            if request.get("type") == "return":
+                raise Exception("You cannot reject a return request")
+            requests.change_status(request.get("_id", ""), "rejected")
+            QtWidgets.QMessageBox.information(None, "Success", "Request rejected")
+            self.load_requests()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
+            return
     def findbooks(self):
         title = self.lineEditTitle.text()
         author = self.lineEditAuthor.text()
