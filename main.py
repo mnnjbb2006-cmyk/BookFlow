@@ -8,7 +8,7 @@
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from Collections import users
-import admin, user
+import admin, user, librarian
 
 class Ui_LoginDialog(object):
     def setupUi(self, LoginDialog):
@@ -120,6 +120,27 @@ class Ui_LoginDialog(object):
                 except:
                     pass
                 self.user_main.show()
+            elif role == "Librarian":
+                self.LoginDialog.hide()
+                self.librarian_main = QtWidgets.QMainWindow()
+                self.librarian_ui = librarian.Ui_MainWindow(username, u.get("name"))
+                self.librarian_ui.setupUi(self.librarian_main)
+
+                def _logout():
+                    try:
+                        self.librarian_main.close()
+                    except Exception:
+                        pass
+                    self.passwordLineEdit.clear()
+                    self.usernameLineEdit.clear()
+                    self.statusLabel.setText("")
+                    self.LoginDialog.show()
+
+                try:
+                    self.librarian_ui.actionLogin.triggered.connect(_logout)
+                except:
+                    pass
+                self.librarian_main.show()
         except Exception as e:
             self.passwordLineEdit.clear()
             self.usernameLineEdit.clear()
