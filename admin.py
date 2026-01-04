@@ -562,7 +562,7 @@ class Ui_MainWindow(object):
             self.tableWidget.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
             self.tableWidget.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
             self.tableWidget.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
-            self.tableWidget.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loanes", ""))))
+            self.tableWidget.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
             self.tableWidget.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
 
     def refresh_low_penalty(self):
@@ -591,7 +591,7 @@ class Ui_MainWindow(object):
             self.tableWidgetBooks.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
             self.tableWidgetBooks.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
             self.tableWidgetBooks.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
-            self.tableWidgetBooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loanes", ""))))
+            self.tableWidgetBooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
             self.tableWidgetBooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
     def book_selection_changed(self):
         selected_rows = self.tableWidgetBooks.selectionModel().selectedRows()
@@ -630,7 +630,7 @@ class Ui_MainWindow(object):
             self.tableWidgetBooks.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
             self.tableWidgetBooks.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
             self.tableWidgetBooks.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
-            self.tableWidgetBooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loanes", ""))))
+            self.tableWidgetBooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
             self.tableWidgetBooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
 
     def del_book(self):
@@ -645,7 +645,7 @@ class Ui_MainWindow(object):
     def edit_book(self):
         try:
             _id = books.find_id(title=self.selected_book_title, author=self.selected_book_author)
-            books.editbook(_id, self.lineEditTitle.text(), self.lineEditAuthor.text(), self.lineEditCategory.text(), self.spinBoxTotalcount.value())
+            books.editbook(_id, self.lineEditTitle.text(), self.lineEditAuthor.text(), self.lineEditCategory.text(), self.spinBoxTotalcount.value(), auto=False)
             QtWidgets.QMessageBox.information(None, "Success", "Book edited successfully")
             self.clear_book()
         except Exception as e:
