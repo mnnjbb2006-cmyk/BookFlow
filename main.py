@@ -116,12 +116,16 @@ class Ui_LoginDialog(object):
                     self.LoginDialog.show()
 
                 try:
-                    self.user_ui.actionLogin.triggered.connect(_logout)
+                    self.user_ui.actionLogout.triggered.connect(_logout)
                 except:
                     pass
                 self.user_main.show()
         except Exception as e:
+            self.passwordLineEdit.clear()
+            self.usernameLineEdit.clear()
+            self.LoginDialog.show()
             self.statusLabel.setText(str(e))
+            print(e)
 
 if __name__ == "__main__":
     import sys
