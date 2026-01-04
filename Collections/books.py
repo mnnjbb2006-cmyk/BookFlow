@@ -37,7 +37,7 @@ def addbook(title, author, category, total_count):
 def findbooks(title="", author="", category="", min_total="", min_available="", max_total="", max_available="", _id=""):
     # Find books by filters. If `_id` provided return single book.
     if _id != "":
-        _id = o(_id)
+        #_id = o(_id)
         x = books.find_one({"_id": _id})
         if x == None:
             raise ValueError("This book does not exist")
@@ -82,7 +82,7 @@ def most_loaned(limit=10):
 
 def delbook(_id):
     # Delete a book; prevent deletion when active loans exist.
-    _id = o(_id)
+    #_id = o(_id)
     x = books.find_one({"_id": _id})
     if x == None:
         raise ValueError("_id is invalid")
@@ -93,7 +93,7 @@ def delbook(_id):
 
 def editbook(_id, title="", author="", category="", total_count="", available_count="", loans_num="", loaned="", auto=True):
     # Edit book metadata. When auto=False, available_count = total_count - loans_num.
-    _id = o(_id)
+    #_id = o(_id)
     x = books.find_one({"_id": _id})
     if x == None:
         raise ValueError("This book does not exist")
@@ -110,6 +110,8 @@ def editbook(_id, title="", author="", category="", total_count="", available_co
     if loans_num == "":
         loans_num = x["loans"]
     if auto == False:
+        if total_count == 0:
+            raise ValueError("Totatl count should be positive")
         if total_count < loans_num:
             raise ValueError(f"This book is currently loaned by {loans_num} user(s); total count cannot be less than {loans_num}.")
         available_count = total_count - loans_num
@@ -120,3 +122,11 @@ def editbook(_id, title="", author="", category="", total_count="", available_co
     x = books.update_one({"_id":_id}, {"$set":{"ltitle":ltitle, "title":title, "author":author, "category":category, "total count":total_count, "available count":available_count, "loans":loans_num, "loaned":loaned}}).modified_count
     if x == 0:
         raise Exception("Nothing has been changed")
+
+def find_id(title="", author=""):
+    # Find book by title and author. Return `_id` if found.
+    ltitle = title.lower()
+    x = books.find_one({"ltitle":ltitle, "author":{"$regex":author + "$", "$options":"i"}})
+    if x == None:
+        raise ValueError("This book does not exist")
+    return x.get("_id")

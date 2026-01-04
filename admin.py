@@ -9,10 +9,8 @@
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QAbstractItemView
-import main
-from Collections import users
-from services import loans
-from services import requests
+from Collections import users, books
+from services import loans, requests
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -504,6 +502,7 @@ class Ui_MainWindow(object):
         self.actionLogin.setText(_translate("MainWindow", "Logout"))
         self.setupActions()
         self.refresh_users()
+        self.refresh_books()
     def setupActions(self):
         ###############       /tab users/              #####################################
         #refresh bution should be removed
@@ -520,8 +519,120 @@ class Ui_MainWindow(object):
         self.tableWidgetUsers.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tableWidgetUsers.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.tableWidgetUsers.itemSelectionChanged.connect(self.user_selection_changed)
+        ###############       /tab books/              #####################################
+        self.pushButtonAdd.clicked.connect(self.add_book)
+        self.pushButtonRefresh.clicked.connect(self.refresh_books)
+        self.pushButtonDeleteselected.setDisabled(1)
+        self.pushButtonDeleteselected.clicked.connect(self.del_book)
+        self.pushButtonEditselected.setDisabled(1)
+        self.pushButtonEditselected.clicked.connect(self.edit_book)
+        self.pushButtonClear.clicked.connect(self.clear_book)
+        self.pushButtonClear2.clicked.connect(self.clear_book_search)
+        self.tableWidgetBooks.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tableWidgetBooks.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tableWidgetBooks.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tableWidgetBooks.itemSelectionChanged.connect(self.book_selection_changed)
+        ###############       /tab requests/              #####################################
+        self.tableWidgetRequests.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tableWidgetRequests.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tableWidgetRequests.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tableWidgetRequests.itemSelectionChanged.connect(self.request_selection_changed)
+        ###############       /tab reports/              #####################################
+        #clear buttion should be deleted
+        self.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.tableWidget.itemSelectionChanged.connect(self.report_selection_changed)
 
 #####################           /functions/                   ###################################################################################################################################################
+
+    def clear_book_search(self):
+        self.lineEditTitle2.setText("")
+        self.lineEditAuthor2.setText("")
+        self.lineEditCategory2.setText("")
+        self.refresh_books()
+    def refresh_books(self):
+        self.tableWidgetBooks.setRowCount(0)
+        for book in books.findbooks():
+            rowPosition = self.tableWidgetBooks.rowCount()
+            self.tableWidgetBooks.insertRow(rowPosition)
+            self.tableWidgetBooks.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+            self.tableWidgetBooks.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+            self.tableWidgetBooks.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+            self.tableWidgetBooks.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+            self.tableWidgetBooks.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+            self.tableWidgetBooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loanes", ""))))
+            self.tableWidgetBooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+    def book_selection_changed(self):
+        selected_rows = self.tableWidgetBooks.selectionModel().selectedRows()
+        if selected_rows:
+            self.pushButtonDeleteselected.setDisabled(0)
+            self.pushButtonEditselected.setDisabled(0)
+            selected_book = selected_rows[0]
+            self.selected_book_title = selected_book.data(0)
+            self.selected_book_author = selected_book.siblingAtColumn(1).data()
+            self.lineEditTitle.setText(self.selected_book_title)
+            self.lineEditAuthor.setText(self.selected_book_author)
+            self.lineEditCategory.setText(selected_book.siblingAtColumn(2).data())
+            self.spinBoxTotalcount.setValue(int(selected_book.siblingAtColumn(3).data()))
+        else:
+            self.pushButtonDeleteselected.setDisabled(1)
+            self.pushButtonEditselected.setDisabled(1)
+            self.selected_book = None
+    
+    def request_selection_changed(self):
+        selected_rows = self.tableWidgetRequests.selectionModel().selectedRows()
+        if selected_rows:
+            self.selected_request = selected_rows[0]
+        else:
+            self.selected_request = None
+    def report_selection_changed(self):
+        selected_rows = self.tableWidget.selectionModel().selectedRows()
+        if selected_rows:
+            self.selected_report = selected_rows[0].data()
+        else:
+            self.selected_report = None
+    def findbooks(self):
+        title = self.lineEditTitle.text()
+        author = self.lineEditAuthor.text()
+        category = self.lineEditCategory.text()
+        results = main._book_find_flow(title, author, category)
+        self.tableWidgetBooks.setRowCount(0)
+        for book in results:
+            rowPosition = self.tableWidgetBooks.rowCount()
+            self.tableWidgetBooks.insertRow(rowPosition)
+            self.tableWidgetBooks.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+            self.tableWidgetBooks.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+            self.tableWidgetBooks.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+            self.tableWidgetBooks.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+            self.tableWidgetBooks.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+            self.tableWidgetBooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loanes", ""))))
+            self.tableWidgetBooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+
+    def del_book(self):
+        try:
+            _id = books.find_id(title=self.selected_book_title, author=self.selected_book_author)
+            books.delbook(_id)
+            QtWidgets.QMessageBox.information(None, "Success", "Book deleted successfully")
+            self.clear_book()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
+
+    def edit_book(self):
+        try:
+            _id = books.find_id(title=self.selected_book_title, author=self.selected_book_author)
+            books.editbook(_id, self.lineEditTitle.text(), self.lineEditAuthor.text(), self.lineEditCategory.text(), self.spinBoxTotalcount.value())
+            QtWidgets.QMessageBox.information(None, "Success", "Book edited successfully")
+            self.clear_book()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
+
+    def clear_book(self):
+        self.lineEditTitle.setText("")
+        self.lineEditAuthor.setText("")
+        self.lineEditCategory.setText("")
+        self.spinBoxTotalcount.setValue(0)
+        self.refresh_books()
 
     def user_selection_changed(self):
         selected_rows = self.tableWidgetUsers.selectionModel().selectedRows()
@@ -552,7 +663,7 @@ class Ui_MainWindow(object):
         title = self.lineEditTitle2.text()
         author = self.lineEditAuthor2.text()
         category = self.lineEditCategory2.text()
-        results = main._book_find_flow(title, author, category)
+        results = books.findbooks(title=title, author=author, category=category)
         self.tableWidgetBooks.setRowCount(0)
         for book in results:
             rowPosition = self.tableWidgetBooks.rowCount()
@@ -564,7 +675,17 @@ class Ui_MainWindow(object):
             self.tableWidgetBooks.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
             self.tableWidgetBooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
             self.tableWidgetBooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
-
+    def add_book(self):
+        title = self.lineEditTitle.text()
+        author = self.lineEditAuthor.text()
+        category = self.lineEditCategory.text()
+        total_count = self.spinBoxTotalcount.value()
+        try:
+            books.addbook(title, author, category, total_count)
+            QtWidgets.QMessageBox.information(None, "Success", "Book added successfully")
+            self.clear_book()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
     def add_user(self):
         username = self.lineEditUsername.text()
         password = self.lineEditPassword.text()
