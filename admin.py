@@ -19,7 +19,6 @@ class Ui_MainWindow(object):
         self.username = username
         self.name = name
     def setupUi(self, MainWindow):
-        self.selected_username = None
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
         MainWindow.resize(1037, 779)
@@ -86,9 +85,6 @@ class Ui_MainWindow(object):
         self.pushButtonDisable = QtWidgets.QPushButton(parent=self.widget_2)
         self.pushButtonDisable.setObjectName("pushButtonDisable")
         self.horizontalLayout_3.addWidget(self.pushButtonDisable)
-        self.pushButtonRefresh = QtWidgets.QPushButton(parent=self.widget_2)
-        self.pushButtonRefresh.setObjectName("pushButtonRefresh")
-        self.horizontalLayout_3.addWidget(self.pushButtonRefresh)
         self.verticalLayout.addWidget(self.widget_2)
         self.horizontalLayout_2.addWidget(self.widget)
         self.tableWidgetUsers = QtWidgets.QTableWidget(parent=self.tabUsers)
@@ -205,9 +201,6 @@ class Ui_MainWindow(object):
         self.pushButtonClear = QtWidgets.QPushButton(parent=self.widget_6)
         self.pushButtonClear.setObjectName("pushButtonClear")
         self.horizontalLayout_7.addWidget(self.pushButtonClear)
-        self.Refresh = QtWidgets.QPushButton(parent=self.widget_6)
-        self.Refresh.setObjectName("Refresh")
-        self.horizontalLayout_7.addWidget(self.Refresh)
         self.verticalLayout_2.addWidget(self.widget_6)
         self.horizontalLayout_6.addWidget(self.widget_3)
         self.tableWidgetBooks = QtWidgets.QTableWidget(parent=self.tabBooks)
@@ -293,6 +286,22 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidgetRequests.setHorizontalHeaderItem(13, item)
         self.verticalLayout_3.addWidget(self.tableWidgetRequests)
+        self.widget_10 = QtWidgets.QWidget(parent=self.tabRequests)
+        self.widget_10.setMinimumSize(QtCore.QSize(0, 0))
+        self.widget_10.setObjectName("widget_10")
+        self.horizontalLayout_11 = QtWidgets.QHBoxLayout(self.widget_10)
+        self.horizontalLayout_11.setObjectName("horizontalLayout_11")
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_11.addItem(spacerItem3)
+        self.pushButtonAccept = QtWidgets.QPushButton(parent=self.widget_10)
+        self.pushButtonAccept.setEnabled(False)
+        self.pushButtonAccept.setObjectName("pushButtonAccept")
+        self.horizontalLayout_11.addWidget(self.pushButtonAccept)
+        self.pushButtonReject = QtWidgets.QPushButton(parent=self.widget_10)
+        self.pushButtonReject.setEnabled(False)
+        self.pushButtonReject.setObjectName("pushButtonReject")
+        self.horizontalLayout_11.addWidget(self.pushButtonReject)
+        self.verticalLayout_3.addWidget(self.widget_10)
         self.tabWidget.addTab(self.tabRequests, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
@@ -311,8 +320,11 @@ class Ui_MainWindow(object):
         self.spinBoxLoaned = QtWidgets.QSpinBox(parent=self.widget_8)
         self.spinBoxLoaned.setObjectName("spinBoxLoaned")
         self.horizontalLayout_9.addWidget(self.spinBoxLoaned)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem3)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_9.addItem(spacerItem4)
+        self.pushButtonRefreshTopbooks = QtWidgets.QPushButton(parent=self.widget_8)
+        self.pushButtonRefreshTopbooks.setObjectName("pushButtonRefreshTopbooks")
+        self.horizontalLayout_9.addWidget(self.pushButtonRefreshTopbooks)
         self.verticalLayout_4.addWidget(self.widget_8)
         self.tableWidget = QtWidgets.QTableWidget(parent=self.tab)
         self.tableWidget.setObjectName("tableWidget")
@@ -346,8 +358,11 @@ class Ui_MainWindow(object):
         self.spinBoxPenalty = QtWidgets.QSpinBox(parent=self.widget_9)
         self.spinBoxPenalty.setObjectName("spinBoxPenalty")
         self.horizontalLayout_10.addWidget(self.spinBoxPenalty)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.horizontalLayout_10.addItem(spacerItem4)
+        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.horizontalLayout_10.addItem(spacerItem5)
+        self.pushButtonLowpenalty = QtWidgets.QPushButton(parent=self.widget_9)
+        self.pushButtonLowpenalty.setObjectName("pushButtonLowpenalty")
+        self.horizontalLayout_10.addWidget(self.pushButtonLowpenalty)
         self.verticalLayout_4.addWidget(self.widget_9)
         self.tableWidget_2 = QtWidgets.QTableWidget(parent=self.tab)
         self.tableWidget_2.setObjectName("tableWidget_2")
@@ -383,9 +398,10 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", f"BookFlow - Admin Panel ({self.name} - {self.username})"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "BookFlow"))
         self.label.setText(_translate("MainWindow", "Username:"))
         self.label_2.setText(_translate("MainWindow", "Password:"))
         self.label_3.setText(_translate("MainWindow", "Full Name:"))
@@ -397,7 +413,6 @@ class Ui_MainWindow(object):
         self.pushButtonDelete.setText(_translate("MainWindow", "Delete selected"))
         self.pushButtonEnable.setText(_translate("MainWindow", "Enable selected"))
         self.pushButtonDisable.setText(_translate("MainWindow", "Disable selected"))
-        self.pushButtonRefresh.setText(_translate("MainWindow", "Refresh"))
         item = self.tableWidgetUsers.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Username"))
         item = self.tableWidgetUsers.horizontalHeaderItem(1)
@@ -426,7 +441,6 @@ class Ui_MainWindow(object):
         self.pushButtonEditselected.setText(_translate("MainWindow", "Edit selected"))
         self.pushButtonDeleteselected.setText(_translate("MainWindow", "Delete selected"))
         self.pushButtonClear.setText(_translate("MainWindow", "Clear"))
-        self.Refresh.setText(_translate("MainWindow", "Refresh"))
         item = self.tableWidgetBooks.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Title"))
         item = self.tableWidgetBooks.horizontalHeaderItem(1)
@@ -475,9 +489,12 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Request date"))
         item = self.tableWidgetRequests.horizontalHeaderItem(12)
         item.setText(_translate("MainWindow", "Duration"))
+        self.pushButtonAccept.setText(_translate("MainWindow", "Accept Selected"))
+        self.pushButtonReject.setText(_translate("MainWindow", "Reject Selected"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabRequests), _translate("MainWindow", "Requests"))
         self.label_16.setText(_translate("MainWindow", "Top loaned books"))
         self.label_17.setText(_translate("MainWindow", "Count:"))
+        self.pushButtonRefreshTopbooks.setText(_translate("MainWindow", "Refresh"))
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Title"))
         item = self.tableWidget.horizontalHeaderItem(1)
@@ -494,6 +511,7 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Loaned"))
         self.label_19.setText(_translate("MainWindow", "Low-penalty users"))
         self.label_18.setText(_translate("MainWindow", "Count:"))
+        self.pushButtonLowpenalty.setText(_translate("MainWindow", "Refresh"))
         item = self.tableWidget_2.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Username"))
         item = self.tableWidget_2.horizontalHeaderItem(1)
@@ -513,7 +531,6 @@ class Ui_MainWindow(object):
         #refresh bution should be removed
         self.pushButtonSearch.clicked.connect(self.findbooks)
         self.pushButtonAdduser.clicked.connect(self.add_user)
-        self.pushButtonRefresh.clicked.connect(self.refresh_users)
         self.pushButtonDelete.setDisabled(1)
         self.pushButtonDelete.clicked.connect(self.del_user)
         self.pushButtonEnable.setDisabled(1)
@@ -526,7 +543,6 @@ class Ui_MainWindow(object):
         self.tableWidgetUsers.itemSelectionChanged.connect(self.user_selection_changed)
         ###############       /tab books/              #####################################
         self.pushButtonAdd.clicked.connect(self.add_book)
-        self.pushButtonRefresh.clicked.connect(self.refresh_books)
         self.pushButtonDeleteselected.setDisabled(1)
         self.pushButtonDeleteselected.clicked.connect(self.del_book)
         self.pushButtonEditselected.setDisabled(1)
@@ -554,6 +570,9 @@ class Ui_MainWindow(object):
         self.spinBoxPenalty.setValue(10)
         self.refresh_books()
         self.refresh_low_penalty()
+        self.refresh_top_books()
+        self.pushButtonRefreshTopbooks.clicked.connect(self.refresh_top_books)
+        self.pushButtonLowpenalty.clicked.connect(self.refresh_low_penalty)
 
 #####################           /functions/                   ###################################################################################################################################################
 
@@ -569,6 +588,7 @@ class Ui_MainWindow(object):
             self.tableWidget.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
             self.tableWidget.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
             self.tableWidget.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+        self.spinBoxLoaned.setValue(10)
 
     def refresh_low_penalty(self):
         self.tableWidget_2.setRowCount(0)
@@ -577,10 +597,8 @@ class Ui_MainWindow(object):
             self.tableWidget_2.insertRow(rowPosition)
             self.tableWidget_2.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(user.get("username", "")))
             self.tableWidget_2.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(user.get("name", "")))
-            self.tableWidget_2.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(user.get("role", "")))
-            self.tableWidget_2.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(user.get("status", "")))
-            self.tableWidget_2.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(user.get("penalty", ""))))
-            self.tableWidget_2.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(user.get("loans", ""))))
+            self.tableWidget_2.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(str(user.get("penalty", ""))))
+        self.spinBoxPenalty.setValue(10)
     def clear_book_search(self):
         self.lineEditTitle2.setText("")
         self.lineEditAuthor2.setText("")
@@ -751,7 +769,7 @@ class Ui_MainWindow(object):
     
     def disable_user(self):
         try:
-            if selected_username == self.username:
+            if self.selected_username == self.username:
                 raise Exception("You cannot disable yourself")
             users.disable(self.selected_username)
             QtWidgets.QMessageBox.information(None, "Success", "User disabled successfully")

@@ -139,13 +139,6 @@
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QPushButton" name="pushButtonRefresh">
-                <property name="text">
-                 <string>Refresh</string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </widget>
            </item>
@@ -357,13 +350,6 @@
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QPushButton" name="Refresh">
-                <property name="text">
-                 <string>Refresh</string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </widget>
            </item>
@@ -557,6 +543,51 @@
           </column>
          </widget>
         </item>
+        <item>
+         <widget class="QWidget" name="widget_10" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonAccept">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Accept Selected</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonReject">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Reject Selected</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab">
@@ -596,6 +627,13 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonRefreshTopbooks">
+             <property name="text">
+              <string>Refresh</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -671,6 +709,13 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonLowpenalty">
+             <property name="text">
+              <string>Refresh</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
