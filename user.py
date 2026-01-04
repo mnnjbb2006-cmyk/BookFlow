@@ -344,9 +344,44 @@ class Ui_MainWindow(object):
         self.pushButtonRefreshLonas.clicked.connect(self.refresh_lonas)
         self.pushButtonRefreshRequests.clicked.connect(self.refresh_requests)
         self.pushButtonRefreshTopbooks.clicked.connect(self.refresh_top_books)
+        self.tableWidgetLoans.itemSelectionChanged.connect(self.loans_selection_changed)
+        self.pushButtonRenew.clicked.connect(self.renew)
+        self.pushButtonReturn.clicked.connect(self.return_book)
 
 ################ functions ##########################################################################################################################################################################
 
+    def return_book(self):
+        if self.req_book_title is None:
+            return
+        try:
+            _id = books.find_id(title=self.req_book_title, author=self.req_book_author)
+            requests.request_return(self.username, _id)
+            QtWidgets.QMessageBox.information(None, "Success", "Return request sent successfully")
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
+        self.refresh_requests()
+
+    def renew(self):
+        if self.req_book_title is None:
+            return
+        try:
+            _id = books.find_id(title=self.req_book_title, author=self.req_book_author)
+            duration = self.spinBoxDurationRenew.value()
+            requests.request_renew(self.username, _id, duration)
+            QtWidgets.QMessageBox.information(None, "Success", "Renew request sent successfully")
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
+        self.refresh_requests()
+    def loans_selection_changed(self):
+        row = self.tableWidgetLoans.currentRow()
+        if row != -1:
+            self.pushButtonRenew.setEnabled(1)
+            self.pushButtonReturn.setEnabled(1)
+            self.req_book_title = self.tableWidgetLoans.item(row, 0).text()
+            self.req_book_author = self.tableWidgetLoans.item(row, 1).text()
+        else:
+            self.pushButtonRenew.setEnabled(0)
+            self.pushButtonReturn.setEnabled(0)
     def refresh_books(self):
         self.tableWidgetBrowse.setRowCount(0)
         for book in books.findbooks():
@@ -385,6 +420,7 @@ class Ui_MainWindow(object):
     def Borwse_selection_changed(self):
         row = self.tableWidgetBrowse.currentRow()
         if row == -1:
+            self.pushButtonloan.setEnabled(False)
             return
         self.book_title = self.tableWidgetBrowse.item(row, 0).text()
         self.book_author = self.tableWidgetBrowse.item(row, 1).text()
@@ -405,18 +441,19 @@ class Ui_MainWindow(object):
             QtWidgets.QMessageBox.information(None, "Success", "Loan request sent successfully")
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
+        self.refresh_requests()
 
     def refresh_lonas(self):
         self.tableWidgetLoans.setRowCount(0)
         for loan in loans.my_loans(self.username):
             rowPosition = self.tableWidgetLoans.rowCount()
             self.tableWidgetLoans.insertRow(rowPosition)
-            self.tableWidgetLoans.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(loan.get("title", "")))
-            self.tableWidgetLoans.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(loan.get("author", "")))
-            self.tableWidgetLoans.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(loan.get("category", "")))
-            self.tableWidgetLoans.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(loan.get("duration", ""))))
-            self.tableWidgetLoans.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(loan.get("accepted date", ""))))
-            self.tableWidgetLoans.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(loan.get("return date", ""))))
+            book = books.findbooks(_id=loan.get("book id"))
+            self.tableWidgetLoans.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+            self.tableWidgetLoans.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+            self.tableWidgetLoans.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+            self.tableWidgetLoans.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(loan.get("accepted date", ""))))
+            self.tableWidgetLoans.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(loan.get("return date", ""))))
         self.labelPenalty.setText("Penalty: " + str(users.getuser(self.username, penalty=True)))
     def refresh_requests(self):
         #should add duration
@@ -428,26 +465,22 @@ class Ui_MainWindow(object):
             self.tableWidgetRequests.insertRow(rowPosition)
             self.tableWidgetRequests.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
             self.tableWidgetRequests.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
-            self.tableWidgetRequests.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
-            self.tableWidgetRequests.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(request.get("status", ""))))
+            self.tableWidgetRequests.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(request.get("type", "")))
+            self.tableWidgetRequests.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(request.get("status", "")))
             self.tableWidgetRequests.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(request.get("request date", ""))))
 
     def renew(self):
-        if self.book_title is None:
-            return
         try:
-            _id = books.find_id(title=self.book_title, author=self.book_author)
-            duration = self.spinBoxDuration.value()
+            _id = books.find_id(title=self.req_book_title, author=self.req_book_author)
+            duration = self.spinBoxRenew.value()
             requests.request_renew(self.username, _id, duration)
             QtWidgets.QMessageBox.information(None, "Success", "Renew request sent successfully")
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
 
     def return_book(self):
-        if self.book_title is None:
-            return
         try:
-            _id = books.find_id(title=self.book_title, author=self.book_author)
+            _id = books.find_id(title=self.req_book_title, author=self.req_book_author)
             requests.request_return(self.username, _id)
             QtWidgets.QMessageBox.information(None, "Success", "Return request sent successfully")
         except Exception as e:
