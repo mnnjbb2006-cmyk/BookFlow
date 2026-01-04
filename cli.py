@@ -371,7 +371,7 @@ def User(name, username):
                     log = "\nRequest sent successfully"
 
                 elif sub == 3:
-                    if not loans.check_to_loan(username, _id):
+                    if loans.check_to_loan(username, _id):
                         raise ValueError("You do not have this book")
                     requests.request_renew(username, _id, r("Duration: "))
                     log = "\nRequest sent successfully"

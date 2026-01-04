@@ -7,9 +7,16 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
+from Collections import users, books
+from services import loans, requests
 
 
 class Ui_MainWindow(object):
+
+    def __init__(self, username, name):
+        super().__init__()
+        self.username = username
+        self.name = name
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(832, 600)
@@ -44,9 +51,9 @@ class Ui_MainWindow(object):
         self.lineEditTitle = QtWidgets.QLineEdit(parent=self.widget)
         self.lineEditTitle.setObjectName("lineEditTitle")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.lineEditTitle)
-        self.lineEdieAuthor = QtWidgets.QLineEdit(parent=self.widget)
-        self.lineEdieAuthor.setObjectName("lineEdieAuthor")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.ItemRole.FieldRole, self.lineEdieAuthor)
+        self.lineEditAuthor = QtWidgets.QLineEdit(parent=self.widget)
+        self.lineEditAuthor.setObjectName("lineEditAuthor")
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.ItemRole.FieldRole, self.lineEditAuthor)
         self.lineEditCategory = QtWidgets.QLineEdit(parent=self.widget)
         self.lineEditCategory.setObjectName("lineEditCategory")
         self.formLayout.setWidget(2, QtWidgets.QFormLayout.ItemRole.FieldRole, self.lineEditCategory)
@@ -61,10 +68,10 @@ class Ui_MainWindow(object):
         self.pushButtonClear = QtWidgets.QPushButton(parent=self.widget_3)
         self.pushButtonClear.setObjectName("pushButtonClear")
         self.horizontalLayout_3.addWidget(self.pushButtonClear)
-        self.verticalLayout.addWidget(self.widget_3)
+        self.verticalLayout.addWidget(self.widget_3, 0, QtCore.Qt.AlignmentFlag.AlignLeft)
         self.label_5 = QtWidgets.QLabel(parent=self.widget)
         self.label_5.setObjectName("label_5")
-        self.verticalLayout.addWidget(self.label_5)
+        self.verticalLayout.addWidget(self.label_5, 0, QtCore.Qt.AlignmentFlag.AlignBottom)
         self.widget_2 = QtWidgets.QWidget(parent=self.widget)
         self.widget_2.setObjectName("widget_2")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.widget_2)
@@ -81,7 +88,7 @@ class Ui_MainWindow(object):
         self.pushButtonloan.setEnabled(False)
         self.pushButtonloan.setObjectName("pushButtonloan")
         self.verticalLayout.addWidget(self.pushButtonloan)
-        self.horizontalLayout.addWidget(self.widget)
+        self.horizontalLayout.addWidget(self.widget, 0, QtCore.Qt.AlignmentFlag.AlignLeft)
         self.tableWidgetBrowse = QtWidgets.QTableWidget(parent=self.tabBrowse)
         self.tableWidgetBrowse.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tableWidgetBrowse.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
@@ -251,7 +258,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "BookFlow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", f"BookFlow - User Panel ({self.name} - {self.username})"))
         self.label.setText(_translate("MainWindow", "Search filters"))
         self.label_2.setText(_translate("MainWindow", "Title:"))
         self.label_3.setText(_translate("MainWindow", "Author:"))
@@ -323,13 +330,84 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabBooks), _translate("MainWindow", "Top books"))
         self.menuAccount.setTitle(_translate("MainWindow", "Account"))
         self.actionLogout.setText(_translate("MainWindow", "Logout"))
+        self.set_actions()
+################ set actions ##########################################################################################################################################################################
+    def set_actions(self):
+        ###################### /tab Browse/ ############################
 
+        self.refresh_books()
+        self.pushButtonSearch.clicked.connect(self.find_books)
+        self.pushButtonClear.clicked.connect(self.clear)
+        self.tableWidgetBrowse.itemSelectionChanged.connect(self.Borwse_selection_changed)
+        self.pushButtonloan.clicked.connect(self.loan)
 
+        ###################### /tab Loans/ ############################
+
+################ functions ##########################################################################################################################################################################
+
+    def refresh_books(self):
+        self.tableWidgetBrowse.setRowCount(0)
+        for book in books.findbooks():
+            rowPosition = self.tableWidgetBrowse.rowCount()
+            self.tableWidgetBrowse.insertRow(rowPosition)
+            self.tableWidgetBrowse.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+            self.tableWidgetBrowse.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+            self.tableWidgetBrowse.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+            self.tableWidgetBrowse.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+            self.tableWidgetBrowse.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+            self.tableWidgetBrowse.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
+            self.tableWidgetBrowse.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+    def find_books(self):
+        title = self.lineEditTitle.text()
+        author = self.lineEditAuthor.text()
+        category = self.lineEditCategory.text()
+        results = books.findbooks(title=title, author=author, category=category)
+        self.tableWidgetBrowse.setRowCount(0)
+        for book in results:
+            rowPosition = self.tableWidgetBrowse.rowCount()
+            self.tableWidgetBrowse.insertRow(rowPosition)
+            self.tableWidgetBrowse.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+            self.tableWidgetBrowse.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+            self.tableWidgetBrowse.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+            self.tableWidgetBrowse.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+            self.tableWidgetBrowse.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+            self.tableWidgetBrowse.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
+            self.tableWidgetBrowse.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+
+    def clear(self):
+        self.lineEditAuthor.setText("")
+        self.lineEditTitle.setText("")
+        self.lineEditCategory.setText("")
+        self.refresh_books()
+
+    def Borwse_selection_changed(self):
+        row = self.tableWidgetBrowse.currentRow()
+        if row == -1:
+            return
+        self.book_title = self.tableWidgetBrowse.item(row, 0).text()
+        self.book_author = self.tableWidgetBrowse.item(row, 1).text()
+        self.pushButtonloan.setEnabled(True)
+
+    def loan(self):
+        if self.book_title is None:
+            return
+        try:
+            _id = books.find_id(title=self.book_title, author=self.book_author)
+            book = books.findbooks(_id=_id)
+            if book["available count"] == 0:
+                raise Exception("This book is not available")
+            if loans.check_to_loan(self.username, _id):
+                raise ValueError("You have already loaned this book")
+            duration = self.spinBoxDuration.value()
+            requests.requestloan(self.username, _id, duration)
+            QtWidgets.QMessageBox.information(None, "Success", "Loan request sent successfully")
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
+    ui = Ui_MainWindow("usertest", "usertest")
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec())

@@ -13,6 +13,11 @@ from Collections import users, books
 from services import loans, requests
 
 class Ui_MainWindow(object):
+
+    def __init__(self, username, name):
+        super().__init__()
+        self.username = username
+        self.name = name
     def setupUi(self, MainWindow):
         self.selected_username = None
         MainWindow.setObjectName("MainWindow")
@@ -380,7 +385,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "BookFlow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", f"BookFlow - Admin Panel ({self.name} - {self.username})"))
         self.label.setText(_translate("MainWindow", "Username:"))
         self.label_2.setText(_translate("MainWindow", "Password:"))
         self.label_3.setText(_translate("MainWindow", "Full Name:"))
@@ -594,6 +599,7 @@ class Ui_MainWindow(object):
             self.tableWidgetBooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
             self.tableWidgetBooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
     def book_selection_changed(self):
+        #should change model of selecting
         selected_rows = self.tableWidgetBooks.selectionModel().selectedRows()
         if selected_rows:
             self.pushButtonDeleteselected.setDisabled(0)
@@ -620,7 +626,7 @@ class Ui_MainWindow(object):
         title = self.lineEditTitle.text()
         author = self.lineEditAuthor.text()
         category = self.lineEditCategory.text()
-        results = main._book_find_flow(title, author, category)
+        results = books.findbooks(title=title, author=author, category=category)
         self.tableWidgetBooks.setRowCount(0)
         for book in results:
             rowPosition = self.tableWidgetBooks.rowCount()
