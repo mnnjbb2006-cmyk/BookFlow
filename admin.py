@@ -542,10 +542,40 @@ class Ui_MainWindow(object):
         self.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
-        self.tableWidget.itemSelectionChanged.connect(self.report_selection_changed)
+        self.tableWidget_2.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tableWidget_2.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tableWidget_2.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.spinBoxLoaned.setValue(10)
+        self.spinBoxPenalty.setValue(10)
+        self.refresh_books()
+        self.refresh_low_penalty()
 
 #####################           /functions/                   ###################################################################################################################################################
 
+    def refresh_top_books(self):
+        self.tableWidget.setRowCount(0)
+        for book in books.most_loaned(self.spinBoxLoaned.value()):
+            rowPosition = self.tableWidget.rowCount()
+            self.tableWidget.insertRow(rowPosition)
+            self.tableWidget.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+            self.tableWidget.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+            self.tableWidget.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+            self.tableWidget.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+            self.tableWidget.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+            self.tableWidget.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loanes", ""))))
+            self.tableWidget.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+
+    def refresh_low_penalty(self):
+        self.tableWidget_2.setRowCount(0)
+        for user in users.low_penalty_users(self.spinBoxPenalty.value()):
+            rowPosition = self.tableWidget_2.rowCount()
+            self.tableWidget_2.insertRow(rowPosition)
+            self.tableWidget_2.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(user.get("username", "")))
+            self.tableWidget_2.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(user.get("name", "")))
+            self.tableWidget_2.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(user.get("role", "")))
+            self.tableWidget_2.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(user.get("status", "")))
+            self.tableWidget_2.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(user.get("penalty", ""))))
+            self.tableWidget_2.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(user.get("loans", ""))))
     def clear_book_search(self):
         self.lineEditTitle2.setText("")
         self.lineEditAuthor2.setText("")
@@ -586,12 +616,6 @@ class Ui_MainWindow(object):
             self.selected_request = selected_rows[0]
         else:
             self.selected_request = None
-    def report_selection_changed(self):
-        selected_rows = self.tableWidget.selectionModel().selectedRows()
-        if selected_rows:
-            self.selected_report = selected_rows[0].data()
-        else:
-            self.selected_report = None
     def findbooks(self):
         title = self.lineEditTitle.text()
         author = self.lineEditAuthor.text()

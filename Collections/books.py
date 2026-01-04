@@ -72,7 +72,7 @@ def findbooks(title="", author="", category="", min_total="", min_available="", 
     return list(books.find(query))
 
 
-def most_loaned(limit=10):
+def most_loaned(limit):
     # Return a list of up to `limit` books sorted by the 'loaned' field descending.
 
     try:
