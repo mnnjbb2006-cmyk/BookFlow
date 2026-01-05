@@ -37,7 +37,7 @@ def addbook(title, author, category, total_count):
 def findbooks(title="", author="", category="", min_total="", min_available="", max_total="", max_available="", _id=""):
     # Find books by filters. If `_id` provided return single book.
     if _id != "":
-        #_id = o(_id)
+        _id = o(_id)
         x = books.find_one({"_id": _id})
         if x == None:
             raise ValueError("This book does not exist")

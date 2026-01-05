@@ -12,6 +12,10 @@ from PyQt6.QtWidgets import QAbstractItemView
 from Collections import users, books
 from services import loans, requests
 
+def str_check(s):
+    if "$" in s:
+        raise ValueError("Input contains illegal character '$'")
+
 class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
@@ -575,6 +579,7 @@ class Ui_MainWindow(object):
         try:
             self.tableWidgetRequests.setRowCount(0)
             u = self.lineEditUsername2.text()
+            str_check(u)
             status = self.comboBoxStatus.currentText().lower()
             self.request_ids.clear()
             for rowPosition, request in enumerate(requests.all_requests(u, status)):
@@ -723,7 +728,13 @@ class Ui_MainWindow(object):
 
     def edit_book(self):
         try:
-            books.editbook(self.selected_book_id, self.lineEditTitle.text(), self.lineEditAuthor.text(), self.lineEditCategory.text(), self.spinBoxTotalcount.value(), auto=False)
+            title = self.lineEditTitle.text()
+            author = self.lineEditAuthor.text()
+            category = self.lineEditCategory.text()
+            str_check(title)
+            str_check(author)
+            str_check(category)
+            books.editbook(self.selected_book_id, title, author, category, self.spinBoxTotalcount.value(), auto=False)
             QtWidgets.QMessageBox.information(None, "Success", "Book edited successfully")
             self.clear_book()
         except Exception as e:
@@ -772,6 +783,9 @@ class Ui_MainWindow(object):
             title = self.lineEditTitle2.text()
             author = self.lineEditAuthor2.text()
             category = self.lineEditCategory2.text()
+            str_check(title)
+            str_check(author)
+            str_check(category)
             results = books.findbooks(title=title, author=author, category=category)
             self.tableWidgetBooks.setRowCount(0)
             for rowPosition, book in enumerate(results):
@@ -792,6 +806,9 @@ class Ui_MainWindow(object):
         category = self.lineEditCategory.text()
         total_count = self.spinBoxTotalcount.value()
         try:
+            str_check(title)
+            str_check(author)
+            str_check(category)
             books.addbook(title, author, category, total_count)
             QtWidgets.QMessageBox.information(None, "Success", "Book added successfully")
             self.clear_book()
@@ -804,6 +821,8 @@ class Ui_MainWindow(object):
         name = self.lineEditName.text()
         role = self.comboBoxRole.currentText()
         try:
+            str_check(username)
+            str_check(name)
             users.adduser(username, password, name, role)
             QtWidgets.QMessageBox.information(None, "Success", "User added successfully")
             self.refresh_users()
