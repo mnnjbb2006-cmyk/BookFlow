@@ -428,9 +428,9 @@ class Ui_MainWindow(object):
     def setupActions(self):
         ###############       /tab books/              #####################################
         self.pushButtonAdd.clicked.connect(self.add_book)
-        self.pushButtonDeleteselected.setDisabled(1)
+        self.pushButtonDeleteselected.setEnabled(False)
         self.pushButtonDeleteselected.clicked.connect(self.del_book)
-        self.pushButtonEditselected.setDisabled(1)
+        self.pushButtonEditselected.setEnabled(False)
         self.pushButtonEditselected.clicked.connect(self.edit_book)
         self.pushButtonClear.clicked.connect(self.clear_book)
         self.pushButtonClear2.clicked.connect(self.clear_book_search)
@@ -648,7 +648,9 @@ class Ui_MainWindow(object):
             str_check(category)
             results = books.findbooks(title=title, author=author, category=category)
             self.tableWidgetBooks.setRowCount(0)
+            self.book_ids.clear()
             for rowPosition, book in enumerate(results):
+                self.book_ids.append(book.get("id", None))
                 self.tableWidgetBooks.insertRow(rowPosition)
                 self.tableWidgetBooks.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
                 self.tableWidgetBooks.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
