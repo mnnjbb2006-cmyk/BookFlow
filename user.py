@@ -512,6 +512,7 @@ class Ui_MainWindow(object):
                 self.tableWidgetTopbooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

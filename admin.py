@@ -671,6 +671,7 @@ class Ui_MainWindow(object):
                 self.pushButtonReject.setEnabled(False)
                 self.selected_request_id = None
                 return
+            self.selected_request_id = self.request_ids[row]
             self.pushButtonAccept.setEnabled(True)
             self.pushButtonReject.setEnabled(True)
         except Exception as e:
@@ -678,18 +679,18 @@ class Ui_MainWindow(object):
 
     def accept_request(self):
         try:
-            book = books.findbooks(_id=self.selected_book_id)
             request = requests.get_request(self.selected_request_id)
+            book = books.findbooks(_id=request.get("book id", ""))
             if request.get("type") == "loan":
                 if book["available count"] == 0:
                     raise Exception("This book is not available")
-                books.editbook(available_count=book["available count"] - 1, loans_num=book["loans"] + 1, _id=self.selected_book_id, loaned=book["loaned"] + 1)
+                books.editbook(available_count=book["available count"] - 1, loans_num=book["loans"] + 1, _id=book["_id"], loaned=book["loaned"] + 1)
                 loans.add_loan(request.get("username"), request.get("book id", ""), request.get("duration", ""))
             elif request.get("type") == "return":
-                books.editbook(available_count=book["available count"] + 1, loans_num=book["loans"] - 1, _id=self.selected_book_id)
+                books.editbook(available_count=book["available count"] + 1, loans_num=book["loans"] - 1, _id=book["_id"])
                 loans.del_loan(self.req_username, request.get("book id", ""))
             elif request.get("type") == "renew":
-                books.editbook(_id=self.selected_book_id, loaned=book["loaned"] + 1, available_count=book["available count"])
+                books.editbook(_id=book["_id"], loaned=book["loaned"] + 1, available_count=book["available count"])
                 loans.del_loan(request.get("username"), request.get("book id", ""))
                 loans.add_loan(request.get("username"), request.get("book id", ""), request.get("duration", ""))
             requests.change_status(self.selected_request_id, "accepted")

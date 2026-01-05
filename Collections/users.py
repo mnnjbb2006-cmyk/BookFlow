@@ -58,6 +58,13 @@ def adduser(username, password, name, role):
 
 def low_penalty_users(limit=10):
     # Return list of users whose role == 'User', sorted by penalty ascending (lowest first).
+    try:
+        limit = int(limit)
+    except:
+        raise ValueError("Count should be a positive integer")
+
+    if limit == 0:
+        raise ValueError("Count should be a positive integer")
     rows = list(users.find({"role": "User"}, {"password": 0, "_id": 0, "role": 0, "status": 0}).sort("penalty", 1).limit(int(limit)))
     return rows
 

@@ -74,8 +74,13 @@ def findbooks(title="", author="", category="", min_total="", min_available="", 
 
 def most_loaned(limit):
     # Return a list of up to `limit` books sorted by the 'loaned' field descending.
+    try:
+        limit = int(limit)
+    except:
+        raise ValueError("Count should be a positive integer")
+
     if limit == 0:
-        raise ValueError("Limit should be a positive integer")
+        raise ValueError("Count should be a positive integer")
     return list(books.find({}).sort("loaned", -1).limit(limit))
 
 def delbook(_id):
@@ -103,17 +108,20 @@ def editbook(_id, title="", author="", category="", total_count="", available_co
     if category != "":
         query["category"] = category
     if total_count != "":
-        query["total count"] = i(total_count)
+        query["total count"] = total_count
     if loaned != "":
-        query["loaned"] = i(loaned)
+        query["loaned"] = loaned
     if loans_num != "":
-        query["loans"] = i(loans_num)
+        query["loans"] = loans_num
+    else:
+        loans_num = x["loans"]
     if auto == False:
         if total_count == 0:
             raise ValueError("Totatl count should be positive")
         if total_count < loans_num:
             raise ValueError(f"This book is currently loaned by {loans_num} user(s); total count cannot be less than {loans_num}.")
         available_count = total_count - loans_num
+    query["available count"] = available_count
     ltitle = title.lower()
     x = books.find_one({"ltitle":ltitle, "author":{"$regex":author + "$", "$options":"i"}})
     if x != None and x['_id'] != _id:
