@@ -13,7 +13,6 @@ import admin, user, librarian
 class Ui_LoginDialog(object):
     def setupUi(self, LoginDialog):
         LoginDialog.setObjectName("LoginDialog")
-        # keep a reference to the dialog so we can show it again after logout
         self.LoginDialog = LoginDialog
         LoginDialog.resize(400, 220)
         self.verticalLayout = QtWidgets.QVBoxLayout(LoginDialog)
