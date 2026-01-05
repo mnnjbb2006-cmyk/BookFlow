@@ -73,6 +73,8 @@ class Ui_LoginDialog(object):
         try:
             username = self.usernameLineEdit.text()
             password = self.passwordLineEdit.text()
+            if not username or not password:
+                raise ValueError("Username and password are required")
             u = users.verify_password(username, password)
             if u.get("status") == "disabled":
                 raise Exception("This user is disabled")

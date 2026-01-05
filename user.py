@@ -17,6 +17,10 @@ class Ui_MainWindow(object):
         super().__init__()
         self.username = username
         self.name = name
+        self.book_title = None
+        self.book_author = None
+        self.req_book_title = None
+        self.req_book_author = None
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(832, 600)
@@ -366,138 +370,148 @@ class Ui_MainWindow(object):
             return
         try:
             _id = books.find_id(title=self.req_book_title, author=self.req_book_author)
-            duration = self.spinBoxDurationRenew.value()
+            duration = self.spinBoxRenew.value()
             requests.request_renew(self.username, _id, duration)
             QtWidgets.QMessageBox.information(None, "Success", "Renew request sent successfully")
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
         self.refresh_requests()
     def loans_selection_changed(self):
-        row = self.tableWidgetLoans.currentRow()
-        if row != -1:
-            self.pushButtonRenew.setEnabled(1)
-            self.pushButtonReturn.setEnabled(1)
-            self.req_book_title = self.tableWidgetLoans.item(row, 0).text()
-            self.req_book_author = self.tableWidgetLoans.item(row, 1).text()
-        else:
-            self.pushButtonRenew.setEnabled(0)
-            self.pushButtonReturn.setEnabled(0)
+        try:
+            row = self.tableWidgetLoans.currentRow()
+            if row != -1:
+                self.pushButtonRenew.setEnabled(1)
+                self.pushButtonReturn.setEnabled(1)
+                self.req_book_title = self.tableWidgetLoans.item(row, 0).text()
+                self.req_book_author = self.tableWidgetLoans.item(row, 1).text()
+            else:
+                self.pushButtonRenew.setEnabled(0)
+                self.pushButtonReturn.setEnabled(0)
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
     def refresh_books(self):
-        self.tableWidgetBrowse.setRowCount(0)
-        for book in books.findbooks():
-            rowPosition = self.tableWidgetBrowse.rowCount()
-            self.tableWidgetBrowse.insertRow(rowPosition)
-            self.tableWidgetBrowse.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
-            self.tableWidgetBrowse.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
-            self.tableWidgetBrowse.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
-            self.tableWidgetBrowse.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
-            self.tableWidgetBrowse.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
-            self.tableWidgetBrowse.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
-            self.tableWidgetBrowse.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+        try:
+            self.tableWidgetBrowse.setRowCount(0)
+            for book in books.findbooks():
+                rowPosition = self.tableWidgetBrowse.rowCount()
+                self.tableWidgetBrowse.insertRow(rowPosition)
+                self.tableWidgetBrowse.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+                self.tableWidgetBrowse.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+                self.tableWidgetBrowse.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+                self.tableWidgetBrowse.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+                self.tableWidgetBrowse.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+                self.tableWidgetBrowse.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
+                self.tableWidgetBrowse.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
     def find_books(self):
-        title = self.lineEditTitle.text()
-        author = self.lineEditAuthor.text()
-        category = self.lineEditCategory.text()
-        results = books.findbooks(title=title, author=author, category=category)
-        self.tableWidgetBrowse.setRowCount(0)
-        for book in results:
-            rowPosition = self.tableWidgetBrowse.rowCount()
-            self.tableWidgetBrowse.insertRow(rowPosition)
-            self.tableWidgetBrowse.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
-            self.tableWidgetBrowse.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
-            self.tableWidgetBrowse.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
-            self.tableWidgetBrowse.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
-            self.tableWidgetBrowse.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
-            self.tableWidgetBrowse.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
-            self.tableWidgetBrowse.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+        try:
+            title = self.lineEditTitle.text()
+            author = self.lineEditAuthor.text()
+            category = self.lineEditCategory.text()
+            results = books.findbooks(title=title, author=author, category=category)
+            self.tableWidgetBrowse.setRowCount(0)
+            for book in results:
+                rowPosition = self.tableWidgetBrowse.rowCount()
+                self.tableWidgetBrowse.insertRow(rowPosition)
+                self.tableWidgetBrowse.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+                self.tableWidgetBrowse.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+                self.tableWidgetBrowse.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+                self.tableWidgetBrowse.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+                self.tableWidgetBrowse.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+                self.tableWidgetBrowse.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
+                self.tableWidgetBrowse.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
 
     def clear(self):
-        self.lineEditAuthor.setText("")
-        self.lineEditTitle.setText("")
-        self.lineEditCategory.setText("")
-        self.refresh_books()
+        try:
+            self.lineEditAuthor.setText("")
+            self.lineEditTitle.setText("")
+            self.lineEditCategory.setText("")
+            self.refresh_books()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
 
     def Borwse_selection_changed(self):
-        row = self.tableWidgetBrowse.currentRow()
-        if row == -1:
-            self.pushButtonloan.setEnabled(False)
-            return
-        self.book_title = self.tableWidgetBrowse.item(row, 0).text()
-        self.book_author = self.tableWidgetBrowse.item(row, 1).text()
-        self.pushButtonloan.setEnabled(True)
+        try:
+            row = self.tableWidgetBrowse.currentRow()
+            if row == -1:
+                self.pushButtonloan.setEnabled(False)
+                return
+            self.book_title = self.tableWidgetBrowse.item(row, 0).text()
+            self.book_author = self.tableWidgetBrowse.item(row, 1).text()
+            self.pushButtonloan.setEnabled(True)
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
 
     def loan(self):
-        if self.book_title is None:
-            return
         try:
-            _id = books.find_id(title=self.book_title, author=self.book_author)
-            book = books.findbooks(_id=_id)
-            if book["available count"] == 0:
-                raise Exception("This book is not available")
-            if loans.check_to_loan(self.username, _id):
-                raise ValueError("You have already loaned this book")
-            duration = self.spinBoxDuration.value()
-            requests.requestloan(self.username, _id, duration)
-            QtWidgets.QMessageBox.information(None, "Success", "Loan request sent successfully")
+            if self.book_title is None:
+                return
+            try:
+                _id = books.find_id(title=self.book_title, author=self.book_author)
+                book = books.findbooks(_id=_id)
+                if book["available count"] == 0:
+                    raise Exception("This book is not available")
+                if loans.check_to_loan(self.username, _id):
+                    raise ValueError("You have already loaned this book")
+                duration = self.spinBoxDuration.value()
+                requests.requestloan(self.username, _id, duration)
+                QtWidgets.QMessageBox.information(None, "Success", "Loan request sent successfully")
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(None, "Error", str(e))
+            self.refresh_requests()
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
-        self.refresh_requests()
 
     def refresh_lonas(self):
-        self.tableWidgetLoans.setRowCount(0)
-        for loan in loans.my_loans(self.username):
-            rowPosition = self.tableWidgetLoans.rowCount()
-            self.tableWidgetLoans.insertRow(rowPosition)
-            book = books.findbooks(_id=loan.get("book id"))
-            self.tableWidgetLoans.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
-            self.tableWidgetLoans.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
-            self.tableWidgetLoans.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
-            self.tableWidgetLoans.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(loan.get("accepted date", ""))))
-            self.tableWidgetLoans.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(loan.get("return date", ""))))
-        self.labelPenalty.setText("Penalty: " + str(users.getuser(self.username, penalty=True)))
-    def refresh_requests(self):
-        #should add duration
-        self.tableWidgetRequests.setRowCount(0)
-        for request in requests.myrequests(self.username):
-            rowPosition = self.tableWidgetRequests.rowCount()
-            book_id = request.get("book id")
-            book = books.findbooks(_id=book_id)
-            self.tableWidgetRequests.insertRow(rowPosition)
-            self.tableWidgetRequests.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
-            self.tableWidgetRequests.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
-            self.tableWidgetRequests.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(request.get("type", "")))
-            self.tableWidgetRequests.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(request.get("status", "")))
-            self.tableWidgetRequests.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(request.get("request date", ""))))
-
-    def renew(self):
         try:
-            _id = books.find_id(title=self.req_book_title, author=self.req_book_author)
-            duration = self.spinBoxRenew.value()
-            requests.request_renew(self.username, _id, duration)
-            QtWidgets.QMessageBox.information(None, "Success", "Renew request sent successfully")
+            self.tableWidgetLoans.setRowCount(0)
+            for loan in loans.my_loans(self.username):
+                rowPosition = self.tableWidgetLoans.rowCount()
+                self.tableWidgetLoans.insertRow(rowPosition)
+                book = books.findbooks(_id=loan.get("book id"))
+                self.tableWidgetLoans.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+                self.tableWidgetLoans.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+                self.tableWidgetLoans.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+                self.tableWidgetLoans.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(loan.get("accepted date", ""))))
+                self.tableWidgetLoans.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(loan.get("return date", ""))))
+            self.labelPenalty.setText("Penalty: " + str(users.getuser(self.username, penalty=True)))
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
-
-    def return_book(self):
+    def refresh_requests(self):
         try:
-            _id = books.find_id(title=self.req_book_title, author=self.req_book_author)
-            requests.request_return(self.username, _id)
-            QtWidgets.QMessageBox.information(None, "Success", "Return request sent successfully")
+            #should add duration
+            self.tableWidgetRequests.setRowCount(0)
+            for request in requests.myrequests(self.username):
+                rowPosition = self.tableWidgetRequests.rowCount()
+                book_id = request.get("book id")
+                book = books.findbooks(_id=book_id)
+                self.tableWidgetRequests.insertRow(rowPosition)
+                self.tableWidgetRequests.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+                self.tableWidgetRequests.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+                self.tableWidgetRequests.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(request.get("type", "")))
+                self.tableWidgetRequests.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(request.get("status", "")))
+                self.tableWidgetRequests.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(request.get("request date", ""))))
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
 
     def refresh_top_books(self):
-        self.tableWidgetTopbooks.setRowCount(0)
-        for book in books.most_loaned(self.spinBoxTopbooks.value()):
-            rowPosition = self.tableWidgetTopbooks.rowCount()
-            self.tableWidgetTopbooks.insertRow(rowPosition)
-            self.tableWidgetTopbooks.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
-            self.tableWidgetTopbooks.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
-            self.tableWidgetTopbooks.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
-            self.tableWidgetTopbooks.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
-            self.tableWidgetTopbooks.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
-            self.tableWidgetTopbooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
-            self.tableWidgetTopbooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+        try:
+            self.tableWidgetTopbooks.setRowCount(0)
+            for book in books.most_loaned(self.spinBoxTopbooks.value()):
+                rowPosition = self.tableWidgetTopbooks.rowCount()
+                self.tableWidgetTopbooks.insertRow(rowPosition)
+                self.tableWidgetTopbooks.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
+                self.tableWidgetTopbooks.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
+                self.tableWidgetTopbooks.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(book.get("category", "")))
+                self.tableWidgetTopbooks.setItem(rowPosition , 3, QtWidgets.QTableWidgetItem(str(book.get("total count", ""))))
+                self.tableWidgetTopbooks.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
+                self.tableWidgetTopbooks.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
+                self.tableWidgetTopbooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(None, "Error", str(e))
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

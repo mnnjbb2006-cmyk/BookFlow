@@ -1,7 +1,24 @@
-BookFlowVenv
-test
-__pycache__
-Collections/__pycache__
-services/__pycache__
-.vscode
+# Virtual environments
+.venv/
+BookFlowvenv/
+
+# Bytecode
+*.pyc
+__pycache__/
+
+# PyQt/IDE
+.vscode/
+.idea/
+
+# Local test and build artifacts
+test/
+build/
+dist/
+
+# Misc
 guitest
+*.sqlite3
+*.db
+.DS_Store
+.env
+env/
