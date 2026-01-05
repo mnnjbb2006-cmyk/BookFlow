@@ -12,11 +12,21 @@ from Collections import users, books
 from services import loans, requests
 
 
+def str_check(s):
+    if "$" in s:
+        raise ValueError("Input contains illegal character '$'")
+
 class Ui_MainWindow(object):
+
     def __init__(self, username, name):
         super().__init__()
         self.username = username
         self.name = name
+        self.book_ids = []
+        self.request_ids=[]
+        self.selected_book_id = None
+        self.selected_request_id = None
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
@@ -459,10 +469,12 @@ class Ui_MainWindow(object):
         try:
             self.tableWidgetRequests.setRowCount(0)
             u = self.lineEditUsername2.text()
+            str_check(u)
             status = self.comboBoxStatus.currentText().lower()
-            for request in requests.all_requests(u, status):
+            self.request_ids.clear()
+            for rowPosition, request in enumerate(requests.all_requests(u, status)):
                 book = books.findbooks(_id=request.get("book id", ""))
-                rowPosition = self.tableWidgetRequests.rowCount()
+                self.request_ids.append(request.get("_id", ""))
                 self.tableWidgetRequests.insertRow(rowPosition)
                 self.tableWidgetRequests.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(request.get("username", "")))
                 self.tableWidgetRequests.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("title", "")))
@@ -478,11 +490,11 @@ class Ui_MainWindow(object):
                 self.tableWidgetRequests.setItem(rowPosition , 11, QtWidgets.QTableWidgetItem(str(request.get("duration", ""))))
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
+
     def refresh_top_books(self):
         try:
             self.tableWidget.setRowCount(0)
-            for book in books.most_loaned(self.spinBoxLoaned.value()):
-                rowPosition = self.tableWidget.rowCount()
+            for rowPosition, book in enumerate(books.most_loaned(self.spinBoxLoaned.value())):
                 self.tableWidget.insertRow(rowPosition)
                 self.tableWidget.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
                 self.tableWidget.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
@@ -491,35 +503,32 @@ class Ui_MainWindow(object):
                 self.tableWidget.setItem(rowPosition , 4, QtWidgets.QTableWidgetItem(str(book.get("available count", ""))))
                 self.tableWidget.setItem(rowPosition , 5, QtWidgets.QTableWidgetItem(str(book.get("loans", ""))))
                 self.tableWidget.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
-            self.spinBoxLoaned.setValue(10)
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
 
     def refresh_low_penalty(self):
         try:
             self.tableWidget_2.setRowCount(0)
-            for user in users.low_penalty_users(self.spinBoxPenalty.value()):
-                rowPosition = self.tableWidget_2.rowCount()
+            for rowPosition, user in enumerate(users.low_penalty_users(self.spinBoxPenalty.value())):
                 self.tableWidget_2.insertRow(rowPosition)
                 self.tableWidget_2.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(user.get("username", "")))
                 self.tableWidget_2.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(user.get("name", "")))
                 self.tableWidget_2.setItem(rowPosition , 2, QtWidgets.QTableWidgetItem(str(user.get("penalty", ""))))
-            self.spinBoxPenalty.setValue(10)
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
+
     def clear_book_search(self):
-        try:
-            self.lineEditTitle2.setText("")
-            self.lineEditAuthor2.setText("")
-            self.lineEditCategory2.setText("")
-            self.refresh_books()
-        except Exception as e:
-            QtWidgets.QMessageBox.critical(None, "Error", str(e))
+        self.lineEditTitle2.setText("")
+        self.lineEditAuthor2.setText("")
+        self.lineEditCategory2.setText("")
+        self.refresh_books()
+
     def refresh_books(self):
         try:
             self.tableWidgetBooks.setRowCount(0)
-            for book in books.findbooks():
-                rowPosition = self.tableWidgetBooks.rowCount()
+            self.book_ids.clear()
+            for rowPosition, book in enumerate(books.findbooks()):
+                self.book_ids.append(book.get("_id", ""))
                 self.tableWidgetBooks.insertRow(rowPosition)
                 self.tableWidgetBooks.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
                 self.tableWidgetBooks.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
@@ -530,24 +539,22 @@ class Ui_MainWindow(object):
                 self.tableWidgetBooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
+
     def book_selection_changed(self):
-        #should change model of selecting
         try:
-            selected_rows = self.tableWidgetBooks.selectionModel().selectedRows()
-            if selected_rows:
-                self.pushButtonDeleteselected.setDisabled(0)
-                self.pushButtonEditselected.setDisabled(0)
-                selected_book = selected_rows[0]
-                self.selected_book_title = selected_book.data(0)
-                self.selected_book_author = selected_book.siblingAtColumn(1).data()
-                self.lineEditTitle.setText(self.selected_book_title)
-                self.lineEditAuthor.setText(self.selected_book_author)
-                self.lineEditCategory.setText(selected_book.siblingAtColumn(2).data())
-                self.spinBoxTotalcount.setValue(int(selected_book.siblingAtColumn(3).data()))
+            selected_row = self.tableWidgetBooks.currentRow()
+            if selected_row != -1:
+                self.pushButtonDeleteselected.setEnabled(True)
+                self.pushButtonEditselected.setEnabled(True)
+                self.selected_book_id = self.book_ids[selected_row]
+                self.lineEditTitle.setText(self.tableWidgetBooks.item(selected_row, 0).text())
+                self.lineEditAuthor.setText(self.tableWidgetBooks.item(selected_row, 1).text())
+                self.lineEditCategory.setText(self.tableWidgetBooks.item(selected_row, 2).text())
+                self.spinBoxTotalcount.setValue(int(self.tableWidgetBooks.item(selected_row, 3).text()))
             else:
-                self.pushButtonDeleteselected.setDisabled(1)
-                self.pushButtonEditselected.setDisabled(1)
-                self.selected_book = None
+                self.pushButtonDeleteselected.setEnabled(False)
+                self.pushButtonEditselected.setEnabled(False)
+                self.selected_book_id = None
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
     
@@ -557,10 +564,9 @@ class Ui_MainWindow(object):
             if row == -1 or self.tableWidgetRequests.item(row, 9).text() != "pending":
                 self.pushButtonAccept.setEnabled(False)
                 self.pushButtonReject.setEnabled(False)
+                self.selected_request_id = None
                 return
-            self.req_username = self.tableWidgetRequests.item(row, 0).text()
-            self.req_book_title = self.tableWidgetRequests.item(row, 1).text()
-            self.req_book_author = self.tableWidgetRequests.item(row, 2).text()
+            self.selected_request_id = self.request_ids[row]
             self.pushButtonAccept.setEnabled(True)
             self.pushButtonReject.setEnabled(True)
         except Exception as e:
@@ -568,22 +574,21 @@ class Ui_MainWindow(object):
 
     def accept_request(self):
         try:
-            book_id = books.find_id(title=self.req_book_title, author=self.req_book_author)
-            request = requests.find_request(self.req_username, book_id)
-            book = books.findbooks(_id=book_id)
+            request = requests.get_request(self.selected_request_id)
+            book = books.findbooks(_id=request.get("book id", ""))
             if request.get("type") == "loan":
                 if book["available count"] == 0:
                     raise Exception("This book is not available")
-                books.editbook(available_count=book["available count"] - 1, loans_num=book["loans"] + 1, _id=request.get("book id", ""), loaned=book["loaned"] + 1)
-                loans.add_loan(self.req_username, request.get("book id", ""), request.get("duration", ""))
+                books.editbook(available_count=book["available count"] - 1, loans_num=book["loans"] + 1, _id=book["_id"], loaned=book["loaned"] + 1)
+                loans.add_loan(request.get("username"), request.get("book id", ""), request.get("duration", ""))
             elif request.get("type") == "return":
-                books.editbook(available_count=book["available count"] + 1, loans_num=book["loans"] - 1, _id=request.get("book id", ""))
+                books.editbook(available_count=book["available count"] + 1, loans_num=book["loans"] - 1, _id=book["_id"])
                 loans.del_loan(self.req_username, request.get("book id", ""))
             elif request.get("type") == "renew":
-                books.editbook(_id=request.get("book id", ""), loaned=book["loaned"] + 1, available_count=book["available count"])
-                loans.del_loan(self.req_username, request.get("book id", ""))
-                loans.add_loan(self.req_username, request.get("book id", ""), request.get("duration", ""))
-            requests.change_status(request.get("_id", ""), "accepted")
+                books.editbook(_id=book["_id"], loaned=book["loaned"] + 1, available_count=book["available count"])
+                loans.del_loan(request.get("username"), request.get("book id", ""))
+                loans.add_loan(request.get("username"), request.get("book id", ""), request.get("duration", ""))
+            requests.change_status(self.selected_request_id, "accepted")
             self.load_requests()
             self.refresh_books()
             QtWidgets.QMessageBox.information(None, "Success", "Request accepted")
@@ -593,11 +598,10 @@ class Ui_MainWindow(object):
 
     def reject_request(self):
         try:
-            book_id = books.find_id(title=self.req_book_title, author=self.req_book_author)
-            request = requests.find_request(self.req_username, book_id)
+            request = requests.get_request(self.selected_request_id)
             if request.get("type") == "return":
                 raise Exception("You cannot reject a return request")
-            requests.change_status(request.get("_id", ""), "rejected")
+            requests.change_status(self.selected_request_id, "rejected")
             QtWidgets.QMessageBox.information(None, "Success", "Request rejected")
             self.load_requests()
         except Exception as e:
@@ -605,9 +609,8 @@ class Ui_MainWindow(object):
             return
     def del_book(self):
         try:
-            _id = books.find_id(title=self.selected_book_title, author=self.selected_book_author)
-            requests.del_book(_id)
-            books.delbook(_id)
+            requests.del_book(self.selected_book_id)
+            books.delbook(self.selected_book_id)
             QtWidgets.QMessageBox.information(None, "Success", "Book deleted successfully")
             self.clear_book()
         except Exception as e:
@@ -615,33 +618,37 @@ class Ui_MainWindow(object):
 
     def edit_book(self):
         try:
-            _id = books.find_id(title=self.selected_book_title, author=self.selected_book_author)
-            books.editbook(_id, self.lineEditTitle.text(), self.lineEditAuthor.text(), self.lineEditCategory.text(), self.spinBoxTotalcount.value(), auto=False)
+            title = self.lineEditTitle.text()
+            author = self.lineEditAuthor.text()
+            category = self.lineEditCategory.text()
+            str_check(title)
+            str_check(author)
+            str_check(category)
+            books.editbook(self.selected_book_id, title, author, category, self.spinBoxTotalcount.value(), auto=False)
             QtWidgets.QMessageBox.information(None, "Success", "Book edited successfully")
             self.clear_book()
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
 
     def clear_book(self):
-        try:
-            self.lineEditTitle.setText("")
-            self.lineEditAuthor.setText("")
-            self.lineEditCategory.setText("")
-            self.spinBoxTotalcount.setValue(0)
-            self.refresh_books()
-        except Exception as e:
-            QtWidgets.QMessageBox.critical(None, "Error", str(e))
-
+        self.lineEditTitle.setText("")
+        self.lineEditAuthor.setText("")
+        self.lineEditCategory.setText("")
+        self.spinBoxTotalcount.setValue(0)
+        self.refresh_books()
 
     def findbooks(self):
         try:
+            #should add other stuffs
             title = self.lineEditTitle2.text()
             author = self.lineEditAuthor2.text()
             category = self.lineEditCategory2.text()
+            str_check(title)
+            str_check(author)
+            str_check(category)
             results = books.findbooks(title=title, author=author, category=category)
             self.tableWidgetBooks.setRowCount(0)
-            for book in results:
-                rowPosition = self.tableWidgetBooks.rowCount()
+            for rowPosition, book in enumerate(results):
                 self.tableWidgetBooks.insertRow(rowPosition)
                 self.tableWidgetBooks.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
                 self.tableWidgetBooks.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
@@ -652,12 +659,16 @@ class Ui_MainWindow(object):
                 self.tableWidgetBooks.setItem(rowPosition , 6, QtWidgets.QTableWidgetItem(str(book.get("loaned", ""))))
         except Exception as e:
             QtWidgets.QMessageBox.critical(None, "Error", str(e))
+
     def add_book(self):
         title = self.lineEditTitle.text()
         author = self.lineEditAuthor.text()
         category = self.lineEditCategory.text()
         total_count = self.spinBoxTotalcount.value()
         try:
+            str_check(title)
+            str_check(author)
+            str_check(category)
             books.addbook(title, author, category, total_count)
             QtWidgets.QMessageBox.information(None, "Success", "Book added successfully")
             self.clear_book()
