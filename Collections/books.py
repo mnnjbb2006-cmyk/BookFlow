@@ -74,15 +74,13 @@ def findbooks(title="", author="", category="", min_total="", min_available="", 
 
 def most_loaned(limit):
     # Return a list of up to `limit` books sorted by the 'loaned' field descending.
-
-    try:
-        return list(books.find({}).sort("loaned", -1).limit(int(limit)))
-    except Exception:
-        return []
+    if limit == 0:
+        raise ValueError("Limit should be a positive integer")
+    return list(books.find({}).sort("loaned", -1).limit(limit))
 
 def delbook(_id):
     # Delete a book; prevent deletion when active loans exist.
-    #_id = o(_id)
+    _id = o(_id)
     x = books.find_one({"_id": _id})
     if x == None:
         raise ValueError("_id is invalid")
@@ -93,22 +91,23 @@ def delbook(_id):
 
 def editbook(_id, title="", author="", category="", total_count="", available_count="", loans_num="", loaned="", auto=True):
     # Edit book metadata. When auto=False, available_count = total_count - loans_num.
-    #_id = o(_id)
+    _id = o(_id)
     x = books.find_one({"_id": _id})
     if x == None:
         raise ValueError("This book does not exist")
-    if title == "":
-        title = x["title"]
-    if author == "":
-        author = x["author"]
-    if category == "":
-        category = x["category"]
-    if total_count == "":
-        total_count = x["total count"]
-    if loaned == "":
-        loaned = x["loaned"]
-    if loans_num == "":
-        loans_num = x["loans"]
+    query = {}
+    if title != "":
+        query["title"] = title
+    if author != "":
+        query["author"] = author
+    if category != "":
+        query["category"] = category
+    if total_count != "":
+        query["total count"] = i(total_count)
+    if loaned != "":
+        query["loaned"] = i(loaned)
+    if loans_num != "":
+        query["loans"] = i(loans_num)
     if auto == False:
         if total_count == 0:
             raise ValueError("Totatl count should be positive")
@@ -119,14 +118,6 @@ def editbook(_id, title="", author="", category="", total_count="", available_co
     x = books.find_one({"ltitle":ltitle, "author":{"$regex":author + "$", "$options":"i"}})
     if x != None and x['_id'] != _id:
         raise ValueError("Another book with the same title and author already exists")
-    x = books.update_one({"_id":_id}, {"$set":{"ltitle":ltitle, "title":title, "author":author, "category":category, "total count":total_count, "available count":available_count, "loans":loans_num, "loaned":loaned}}).modified_count
+    x = books.update_one({"_id":_id}, {"$set":query}).modified_count
     if x == 0:
         raise Exception("Nothing has been changed")
-
-def find_id(title="", author=""):
-    # Find book by title and author. Return `_id` if found.
-    ltitle = title.lower()
-    x = books.find_one({"ltitle":ltitle, "author":{"$regex":author + "$", "$options":"i"}})
-    if x == None:
-        raise ValueError("This book does not exist")
-    return x.get("_id")

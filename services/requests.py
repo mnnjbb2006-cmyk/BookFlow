@@ -92,8 +92,5 @@ def del_request_user(username):
     """Delete all requests for a username (used when removing users)."""
     requests.delete_many({"username": username})
 
-def find_request(username, book_id):
-    return requests.find_one({"username": username, "book id": book_id, "status": "pending"})
-
 def del_book(_id):
     requests.delete_many({"book id": _id})
