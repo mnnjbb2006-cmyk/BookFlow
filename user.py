@@ -425,7 +425,7 @@ class Ui_MainWindow(object):
             self.tableWidgetBrowse.setRowCount(0)
             self.book_ids.clear()
             for rowPosition, book in enumerate(results):
-                self.book_ids.append(book.get("id", None))
+                self.book_ids.append(book.get("_id", None))
                 self.tableWidgetBrowse.insertRow(rowPosition)
                 self.tableWidgetBrowse.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
                 self.tableWidgetBrowse.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
@@ -477,7 +477,7 @@ class Ui_MainWindow(object):
             self.tableWidgetLoans.setRowCount(0)
             self.req_ids.clear()
             for rowPosition, loan in enumerate(loans.my_loans(self.username)):
-                self.req_ids.append(loan.get("request id"))
+                self.req_ids.append(loan.get("_id"))
                 self.tableWidgetLoans.insertRow(rowPosition)
                 book = books.findbooks(_id=loan.get("book id"))
                 self.tableWidgetLoans.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
