@@ -650,7 +650,7 @@ class Ui_MainWindow(object):
             self.tableWidgetBooks.setRowCount(0)
             self.book_ids.clear()
             for rowPosition, book in enumerate(results):
-                self.book_ids.append(book.get("id", None))
+                self.book_ids.append(book.get("_id", None))
                 self.tableWidgetBooks.insertRow(rowPosition)
                 self.tableWidgetBooks.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
                 self.tableWidgetBooks.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))

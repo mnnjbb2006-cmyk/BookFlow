@@ -401,7 +401,7 @@ class Ui_MainWindow(object):
             self.tableWidgetBrowse.setRowCount(0)
             self.book_ids.clear()
             for rowPosition, book in enumerate(books.findbooks()):
-                self.book_ids.append(book.get("id", None))
+                self.book_ids.append(book.get("_id", None))
                 self.tableWidgetBrowse.insertRow(rowPosition)
                 self.tableWidgetBrowse.setItem(rowPosition , 0, QtWidgets.QTableWidgetItem(book.get("title", "")))
                 self.tableWidgetBrowse.setItem(rowPosition , 1, QtWidgets.QTableWidgetItem(book.get("author", "")))
@@ -451,6 +451,7 @@ class Ui_MainWindow(object):
             row = self.tableWidgetBrowse.currentRow()
             if row == -1:
                 self.pushButtonloan.setEnabled(False)
+                self.selected_book_id = None
                 return
             self.selected_book_id = self.book_ids[row]
             self.pushButtonloan.setEnabled(True)

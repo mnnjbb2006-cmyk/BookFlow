@@ -18,14 +18,14 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabBrowse">
        <attribute name="title">
         <string>Browse</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
+        <item alignment="Qt::AlignmentFlag::AlignLeft">
          <widget class="QWidget" name="widget" native="true">
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
@@ -69,7 +69,7 @@
              </item>
             </layout>
            </item>
-           <item>
+           <item alignment="Qt::AlignmentFlag::AlignLeft">
             <widget class="QWidget" name="widget_3" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
@@ -89,7 +89,7 @@
              </layout>
             </widget>
            </item>
-           <item>
+           <item alignment="Qt::AlignmentFlag::AlignBottom">
             <widget class="QLabel" name="label_5">
              <property name="text">
               <string>Loan request</string>
