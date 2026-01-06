@@ -693,7 +693,7 @@ class Ui_MainWindow(object):
                 loans.add_loan(request.get("username"), request.get("book id", ""), request.get("duration", ""))
             elif request.get("type") == "return":
                 books.editbook(available_count=book["available count"] + 1, loans_num=book["loans"] - 1, _id=book["_id"])
-                loans.del_loan(self.req_username, request.get("book id", ""))
+                loans.del_loan(request.get("username"), request.get("book id", ""))
             elif request.get("type") == "renew":
                 books.editbook(_id=book["_id"], loaned=book["loaned"] + 1, available_count=book["available count"])
                 loans.del_loan(request.get("username"), request.get("book id", ""))

@@ -363,8 +363,7 @@ class Ui_MainWindow(object):
 
     def return_book(self):
         try:
-            request = requests.get_request(self.req_id)
-            _id = request.get("book_id")
+            _id = loans.get_book_id(self.req_id)
             requests.request_return(self.username, _id)
             QtWidgets.QMessageBox.information(None, "Success", "Return request sent successfully")
         except Exception as e:
@@ -373,8 +372,7 @@ class Ui_MainWindow(object):
 
     def renew(self):
         try:
-            request = requests.get_request(self.req_id)
-            _id = request.get("book_id")
+            _id = loans.get_book_id(self.req_id)
             duration = self.spinBoxRenew.value()
             requests.request_renew(self.username, _id, duration)
             QtWidgets.QMessageBox.information(None, "Success", "Renew request sent successfully")
