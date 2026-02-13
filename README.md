@@ -16,7 +16,7 @@ A small desktop library management system built with PyQt6 and MongoDB. Features
 1. Clone the repo and cd into it:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/mnnjbb2006-cmyk/BookFlow
 cd BookFlow
 ```
 
